@@ -19,6 +19,12 @@ export const ChevronRight = (p) => (
 export const ChevronLeft = (p) => (
   <svg {...base} {...p}><path d="M15 6l-6 6 6 6" /></svg>
 )
+export const ChevronDown = (p) => (
+  <svg {...base} {...p}><path d="M6 9l6 6 6-6" /></svg>
+)
+export const Check = (p) => (
+  <svg {...base} {...p}><path d="M4 12l5 5L20 6" /></svg>
+)
 export const Search = (p) => (
   <svg {...base} {...p}>
     <circle cx="11" cy="11" r="7" />

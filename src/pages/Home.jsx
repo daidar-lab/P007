@@ -8,6 +8,7 @@ import TextField from '../components/TextField.jsx'
 import TextArea from '../components/TextArea.jsx'
 import RadioGroup from '../components/RadioGroup.jsx'
 import CheckboxGroup from '../components/CheckboxGroup.jsx'
+import Combobox from '../components/Combobox.jsx'
 import PhotoUploader from '../components/PhotoUploader.jsx'
 import { ChevronLeft, ChevronRight } from '../components/Icon.jsx'
 import './Home.css'
@@ -39,6 +40,17 @@ const STEPS = [
 const EMPRESA_OPTIONS = [
   { value: 'frutal',     label: 'Frutal' },
   { value: 'petropolis', label: 'Petrópolis' },
+]
+
+const AREA_OPTIONS = [
+  { value: 'logistica',  label: 'Logística' },
+  { value: 'industrial', label: 'Industrial' },
+  { value: 'marketing',  label: 'Marketing' },
+  { value: 'ti',         label: 'TI' },
+  { value: 'compras',    label: 'Compras' },
+  { value: 'eta',        label: 'ETA' },
+  { value: 'atdi',       label: 'ATDI' },
+  { value: 'portaria',   label: 'Portaria' },
 ]
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -230,7 +242,13 @@ export default function Home() {
               </Field>
             </FieldRow>
             <Field label="Área onde a intervenção foi realizada" required>
-              <TextField value={form.area} onChange={onInput('area')} placeholder="Ex.: Área de produção" />
+              <Combobox
+                value={form.area}
+                onChange={set('area')}
+                options={AREA_OPTIONS}
+                placeholder="Selecione a área"
+                searchPlaceholder="Buscar área…"
+              />
             </Field>
             <Field label="Setor onde a intervenção foi realizada" required>
               <TextField value={form.setor} onChange={onInput('setor')} placeholder="Ex.: Linha 02" />
