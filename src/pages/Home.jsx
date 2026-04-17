@@ -8,6 +8,7 @@ import TextField from '../components/TextField.jsx'
 import TextArea from '../components/TextArea.jsx'
 import RadioGroup from '../components/RadioGroup.jsx'
 import CheckboxGroup from '../components/CheckboxGroup.jsx'
+import PhotoUploader from '../components/PhotoUploader.jsx'
 import { ChevronLeft, ChevronRight } from '../components/Icon.jsx'
 import './Home.css'
 
@@ -31,7 +32,8 @@ const STEPS = [
   'Identificação',
   'Responsável',
   'Observações',
-  'Relato & envio',
+  'Relato',
+  'Fotos & envio',
 ]
 
 const EMPRESA_OPTIONS = [
@@ -61,6 +63,7 @@ const emptyForm = () => {
     descricao: '',
     acoes: '',
     altoRisco: '',
+    fotos: [],
   }
 }
 
@@ -120,6 +123,8 @@ export default function Home() {
           filled(form.acoes) &&
           filled(form.altoRisco)
         )
+      case 5:
+        return true
       default:
         return true
     }
@@ -134,6 +139,7 @@ export default function Home() {
     console.log('Comunicado de Intervenção:', form)
     setSent(true)
     setTimeout(() => {
+      form.fotos.forEach(p => URL.revokeObjectURL(p.src))
       setSent(false)
       setForm(emptyForm())
       setStep(0)
@@ -292,7 +298,21 @@ export default function Home() {
                 />
               </Field>
             </Card>
+          </div>
+        )}
 
+        {step === 5 && (
+          <div className="stack stack-md">
+            <Field
+              label="Fotos da intervenção"
+              hint="Opcional — adicione até 10 fotos da galeria ou tire na hora"
+            >
+              <PhotoUploader
+                value={form.fotos}
+                onChange={set('fotos')}
+                max={10}
+              />
+            </Field>
             <p className="disclaimer">
               Ao enviar, este comunicado será entregue à Segurança do Trabalho.
             </p>

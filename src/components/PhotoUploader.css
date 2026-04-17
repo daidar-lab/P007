@@ -1,0 +1,106 @@
+.photo-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.photo-uploader__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.photo-uploader__actions .btn { width: 100%; }
+
+.photo-uploader__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.photo-uploader__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-inset);
+  text-align: center;
+}
+.photo-uploader__empty-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-uploader__empty-title {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
+}
+.photo-uploader__empty-hint {
+  margin: 0;
+  font-size: var(--fs-12);
+  color: var(--color-text-tertiary);
+  line-height: var(--lh-snug);
+}
+
+.photo-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.photo-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+  box-shadow: var(--shadow-inset);
+  animation: thumb-in var(--dur-base) var(--ease-emphasize);
+}
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-thumb__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: rgba(17, 17, 17, 0.72);
+  color: var(--color-text-on-invert);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.photo-thumb__remove:hover { background: rgba(0, 0, 0, 0.9); }
+
+.photo-uploader__meta {
+  margin: 0;
+  font-size: var(--fs-12);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+@keyframes thumb-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
