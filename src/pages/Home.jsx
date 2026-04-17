@@ -109,8 +109,11 @@ export default function Home() {
           filled(form.matricula) &&
           filled(form.funcao)
         )
-      case 3:
-        return form.observacoes.length > 0 && filled(form.outros)
+      case 3: {
+        if (form.observacoes.length === 0) return false
+        if (form.observacoes.includes('outros') && !filled(form.outros)) return false
+        return true
+      }
       case 4:
         return (
           filled(form.descricao) &&
@@ -232,18 +235,27 @@ export default function Home() {
         )}
 
         {step === 3 && (
-          <div className="stack stack-md">
-            <Field label="Itens observados" hint="Marque ao menos um item" required>
-              <CheckboxGroup
-                value={form.observacoes}
-                onChange={set('observacoes')}
-                options={OBSERVACAO_OPTIONS}
-              />
-            </Field>
-            <Field label="Outros" required>
-              <TextField value={form.outros} onChange={onInput('outros')} placeholder="Descreva outra condição observada" />
-            </Field>
-          </div>
+          <Field label="Itens observados" hint="Marque ao menos um item" required>
+            <CheckboxGroup
+              value={form.observacoes}
+              onChange={set('observacoes')}
+              options={[
+                ...OBSERVACAO_OPTIONS,
+                {
+                  value: 'outros',
+                  label: 'Outros',
+                  extra: (
+                    <TextField
+                      value={form.outros}
+                      onChange={onInput('outros')}
+                      placeholder="Descreva outra condição observada"
+                      autoFocus
+                    />
+                  ),
+                },
+              ]}
+            />
+          </Field>
         )}
 
         {step === 4 && (
