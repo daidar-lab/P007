@@ -34,27 +34,59 @@ const STEPS = [
   'Relato & envio',
 ]
 
-const EMPTY = {
-  classificacao: '',
-  empresa: '', unidade: '',
-  data: '', hora: '', turno: '',
-  area: '', setor: '',
-  atividade: '',
-  intervencaoPor: '',
-  matricula: '', funcao: '',
-  observacoes: [], outros: '',
-  descricao: '',
-  acoes: '',
-  altoRisco: '',
+const EMPRESA_OPTIONS = [
+  { value: 'frutal',     label: 'Frutal' },
+  { value: 'petropolis', label: 'Petrópolis' },
+]
+
+const pad = (n) => String(n).padStart(2, '0')
+const nowParts = () => {
+  const d = new Date()
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  }
+}
+const emptyForm = () => {
+  const { date, time } = nowParts()
+  return {
+    classificacao: '',
+    empresa: '',
+    data: date, hora: time,
+    area: '', setor: '',
+    atividade: '',
+    intervencaoPor: '',
+    matricula: '', funcao: '',
+    observacoes: [], outros: '',
+    descricao: '',
+    acoes: '',
+    altoRisco: '',
+  }
 }
 
 export default function Home() {
-  const [form, setForm] = useState(EMPTY)
+  const [form, setForm] = useState(emptyForm)
   const [step, setStep] = useState(0)
   const [sent, setSent] = useState(false)
 
   const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
   const onInput = (k) => (e) => set(k)(e.target.value)
+
+  const { date: todayStr, time: nowTimeStr } = nowParts()
+
+  const onDataChange = (e) => {
+    let value = e.target.value || todayStr
+    if (value > todayStr) value = todayStr
+    setForm(f => {
+      const hora = value === todayStr && f.hora > nowTimeStr ? nowTimeStr : f.hora
+      return { ...f, data: value, hora }
+    })
+  }
+  const onHoraChange = (e) => {
+    let value = e.target.value || nowTimeStr
+    if (form.data === todayStr && value > nowTimeStr) value = nowTimeStr
+    set('hora')(value)
+  }
 
   const canAdvance = () => {
     switch (step) {
@@ -74,7 +106,7 @@ export default function Home() {
     setSent(true)
     setTimeout(() => {
       setSent(false)
-      setForm(EMPTY)
+      setForm(emptyForm())
       setStep(0)
     }, 2800)
   }
@@ -119,35 +151,32 @@ export default function Home() {
 
         {step === 1 && (
           <Card padding="lg" className="stack stack-md">
-            <FieldRow>
-              <Field label="Empresa">
-                <TextField value={form.empresa} onChange={onInput('empresa')} placeholder="Ex.: Cidade Imperial" />
-              </Field>
-              <Field label="Unidade">
-                <TextField value={form.unidade} onChange={onInput('unidade')} placeholder="Ex.: Matriz" />
-              </Field>
-            </FieldRow>
-            <FieldRow>
-              <Field label="Data">
-                <TextField type="date" value={form.data} onChange={onInput('data')} />
-              </Field>
-              <Field label="Hora">
-                <TextField type="time" value={form.hora} onChange={onInput('hora')} />
-              </Field>
-            </FieldRow>
-            <Field label="Turno">
+            <Field label="Empresa" required>
               <RadioGroup
-                name="turno"
-                value={form.turno}
-                onChange={set('turno')}
-                options={[
-                  { value: '1',   label: '1º' },
-                  { value: '2',   label: '2º' },
-                  { value: '3',   label: '3º' },
-                  { value: 'adm', label: 'ADM' },
-                ]}
+                name="empresa"
+                value={form.empresa}
+                onChange={set('empresa')}
+                options={EMPRESA_OPTIONS}
               />
             </Field>
+            <FieldRow>
+              <Field label="Data" hint="Não pode ser futura">
+                <TextField
+                  type="date"
+                  value={form.data}
+                  max={todayStr}
+                  onChange={onDataChange}
+                />
+              </Field>
+              <Field label="Hora" hint="Não pode ser futura">
+                <TextField
+                  type="time"
+                  value={form.hora}
+                  max={form.data === todayStr ? nowTimeStr : undefined}
+                  onChange={onHoraChange}
+                />
+              </Field>
+            </FieldRow>
             <Field label="Área onde a intervenção foi realizada">
               <TextField value={form.area} onChange={onInput('area')} placeholder="Ex.: Área de produção" />
             </Field>
