@@ -48,6 +48,32 @@
   line-height: var(--lh-snug);
 }
 
+.wizard-step {
+  animation: step-in var(--dur-slow) var(--ease-emphasize);
+}
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-hint {
+  margin: 0;
+  padding: 0 var(--space-2);
+  font-size: var(--fs-13);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-snug);
+}
+
+.wizard-actions {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+.wizard-actions .btn { width: 100%; }
+
 .toast {
   position: fixed;
   left: 50%;
