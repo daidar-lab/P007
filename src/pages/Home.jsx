@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import StatusBar from '../components/StatusBar.jsx'
 import Header from '../components/Header.jsx'
 import SearchBar from '../components/SearchBar.jsx'
 import Button from '../components/Button.jsx'
@@ -23,7 +22,6 @@ export default function Home() {
 
   return (
     <>
-      <StatusBar />
       <div className="screen">
         <Header
           leading={<Avatar name="AR" size={36} />}
