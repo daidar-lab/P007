@@ -1,6 +1,7 @@
 import './Button.css'
 
 export default function Button({
+  type = 'button',
   variant = 'primary',
   size = 'md',
   full = false,
@@ -20,7 +21,7 @@ export default function Button({
   ].filter(Boolean).join(' ')
 
   return (
-    <button className={cls} {...rest}>
+    <button type={type} className={cls} {...rest}>
       {icon && <span className="btn__icon">{icon}</span>}
       {children && <span className="btn__label">{children}</span>}
       {iconRight && <span className="btn__icon">{iconRight}</span>}

@@ -137,6 +137,9 @@ export default function Home() {
 
   const submit = async (e) => {
     e.preventDefault()
+    // Só envia quando o usuário está na última etapa (Fotos).
+    // Evita que Enter em qualquer campo de texto dispare o envio antes da hora.
+    if (step !== STEPS.length - 1) return
     if (!canAdvance() || submitting) return
     setSubmitting(true)
 
