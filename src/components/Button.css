@@ -1,0 +1,65 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-pill);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-normal);
+  line-height: 1;
+  transition:
+    background-color var(--dur-base) var(--ease-standard),
+    color var(--dur-base) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn--full { width: 100%; }
+
+/* ---------- Tamanhos ---------- */
+.btn--sm { height: 36px; padding: 0 var(--space-4); font-size: var(--fs-13); }
+.btn--md { height: 48px; padding: 0 var(--space-6); font-size: var(--fs-15); }
+.btn--lg { height: 56px; padding: 0 var(--space-7); font-size: var(--fs-17); }
+
+.btn--icon-only.btn--sm { width: 36px; padding: 0; }
+.btn--icon-only.btn--md { width: 48px; padding: 0; }
+.btn--icon-only.btn--lg { width: 56px; padding: 0; }
+
+/* ---------- Variantes ---------- */
+.btn--primary {
+  background: var(--color-invert);
+  color: var(--color-text-on-invert);
+  box-shadow: var(--shadow-sm);
+}
+.btn--primary:hover { background: var(--color-invert-hover); }
+.btn--primary:active { background: var(--color-invert-press); }
+
+.btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-inset);
+}
+.btn--secondary:hover { background: var(--color-surface-muted); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text);
+}
+.btn--ghost:hover { background: var(--color-surface-muted); }
+
+.btn--soft {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+.btn--soft:hover { background: #E4E4E1; }
+
+.btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn__icon svg { display: block; }

@@ -1,0 +1,14 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-invert);
+  color: var(--color-text-on-invert);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-normal);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-inset);
+}
+.avatar__img { width: 100%; height: 100%; object-fit: cover; }

@@ -1,0 +1,131 @@
+/*
+ * Design tokens — Mono / premium iOS
+ * Paleta monocromática, pílulas, respiração ampla.
+ */
+
+:root {
+  /* ---------- Cor / Superfície ---------- */
+  --color-bg: #F5F5F3;           /* base off-white */
+  --color-surface: #FFFFFF;      /* cartões */
+  --color-surface-muted: #EEEEEC;/* superfícies secundárias */
+  --color-elevated: #FFFFFF;     /* elementos flutuantes */
+
+  /* ---------- Cor / Texto ---------- */
+  --color-text: #111111;         /* título / ênfase */
+  --color-text-secondary: #5B5B5B;
+  --color-text-tertiary: #8A8A8A;
+  --color-text-on-invert: #FFFFFF;
+
+  /* ---------- Cor / Linha ---------- */
+  --color-border: rgba(17, 17, 17, 0.08);
+  --color-border-strong: rgba(17, 17, 17, 0.16);
+  --color-divider: rgba(17, 17, 17, 0.06);
+
+  /* ---------- Cor / Ação ---------- */
+  --color-invert: #111111;       /* botão primário */
+  --color-invert-hover: #2A2A2A;
+  --color-invert-press: #000000;
+
+  /* Accents sutis (opcionais, para estados) */
+  --color-accent-success: #2E7D5B;
+  --color-accent-warning: #B07A0C;
+  --color-accent-danger:  #B42318;
+
+  /* ---------- Tipografia ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+               'SF Pro Text', 'Inter', 'Segoe UI', Roboto, Helvetica,
+               Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+               'Liberation Mono', monospace;
+
+  --fs-11: 0.6875rem;  /* 11px caption */
+  --fs-12: 0.75rem;    /* 12px micro */
+  --fs-13: 0.8125rem;  /* 13px label */
+  --fs-14: 0.875rem;   /* 14px body sm */
+  --fs-15: 0.9375rem;  /* 15px body */
+  --fs-17: 1.0625rem;  /* 17px body lg (iOS padrão) */
+  --fs-20: 1.25rem;    /* 20px title sm */
+  --fs-24: 1.5rem;     /* 24px title */
+  --fs-28: 1.75rem;    /* 28px title lg */
+  --fs-34: 2.125rem;   /* 34px large title */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-normal: 1.45;
+  --lh-relaxed: 1.6;
+
+  --ls-tight: -0.02em;
+  --ls-normal: -0.01em;
+  --ls-wide: 0.04em;
+
+  /* ---------- Espaçamento (escala 4) ---------- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+
+  /* ---------- Raios ---------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;     /* pílula */
+
+  /* ---------- Sombras ---------- */
+  --shadow-xs: 0 1px 2px rgba(17, 17, 17, 0.04);
+  --shadow-sm: 0 2px 6px rgba(17, 17, 17, 0.05);
+  --shadow-md: 0 8px 24px rgba(17, 17, 17, 0.06);
+  --shadow-lg: 0 20px 48px rgba(17, 17, 17, 0.08);
+  --shadow-inset: inset 0 0 0 1px var(--color-border);
+
+  /* ---------- Motion ---------- */
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-emphasize: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* ---------- Layout ---------- */
+  --container-mobile: 390px;    /* referência iPhone 14 */
+  --container-wide: 440px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- Dark mode opcional (prévia) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --color-bg: #0E0E0E;
+    --color-surface: #181818;
+    --color-surface-muted: #1F1F1F;
+    --color-elevated: #1C1C1C;
+    --color-text: #F5F5F3;
+    --color-text-secondary: #B5B5B5;
+    --color-text-tertiary: #8A8A8A;
+    --color-text-on-invert: #111111;
+    --color-border: rgba(245, 245, 243, 0.10);
+    --color-border-strong: rgba(245, 245, 243, 0.18);
+    --color-divider: rgba(245, 245, 243, 0.06);
+    --color-invert: #F5F5F3;
+    --color-invert-hover: #E5E5E3;
+    --color-invert-press: #FFFFFF;
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55);
+  }
+}

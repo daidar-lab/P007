@@ -1,0 +1,117 @@
+@import "./tokens.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-15);
+  line-height: var(--lh-normal);
+  letter-spacing: var(--ls-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ----- Scrollbars discretos ----- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ----- Utilitários ----- */
+.text-title-lg {
+  font-size: var(--fs-34);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
+}
+.text-title {
+  font-size: var(--fs-24);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-snug);
+}
+.text-section {
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+.text-body   { font-size: var(--fs-15); }
+.text-body-lg{ font-size: var(--fs-17); }
+.text-muted  { color: var(--color-text-secondary); }
+.text-subtle { color: var(--color-text-tertiary); }
+
+/* ----- Container "mobile" centralizado ----- */
+.app-shell {
+  min-height: 100%;
+  display: grid;
+  place-items: start center;
+  padding: var(--space-6) var(--space-4);
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(17,17,17,0.04), transparent 60%),
+    var(--color-bg);
+}
+
+.device-frame {
+  width: 100%;
+  max-width: var(--container-mobile);
+  min-height: 844px;
+  background: var(--color-bg);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  padding-top: calc(var(--safe-top) + var(--space-2));
+  padding-bottom: calc(var(--safe-bottom) + var(--space-6));
+  overflow: hidden;
+  position: relative;
+}
+
+/* Layout empilhado típico do app */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-5);
+}
+
+.stack { display: flex; flex-direction: column; }
+.stack-sm { gap: var(--space-2); }
+.stack-md { gap: var(--space-4); }
+.stack-lg { gap: var(--space-6); }
+
+.row { display: flex; align-items: center; }
+.row-between { justify-content: space-between; }
+.row-gap-2 { gap: var(--space-2); }
+.row-gap-3 { gap: var(--space-3); }
+.row-gap-4 { gap: var(--space-4); }
+
+/* Focus visível, acessível e discreto */
+:focus-visible {
+  outline: 2px solid var(--color-invert);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

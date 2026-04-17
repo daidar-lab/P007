@@ -1,0 +1,12 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-inset);
+}
+.card--elevated {
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+}
+.card--p-none { padding: 0; }
+.card--p-sm   { padding: var(--space-4); }
+.card--p-md   { padding: var(--space-5); }
+.card--p-lg   { padding: var(--space-6); }

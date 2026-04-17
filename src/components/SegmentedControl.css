@@ -1,0 +1,23 @@
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+.segmented__item {
+  height: 36px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--dur-base) var(--ease-standard),
+    color var(--dur-base) var(--ease-standard);
+}
+.segmented__item.is-active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-xs), var(--shadow-inset);
+}

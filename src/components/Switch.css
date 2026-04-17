@@ -1,0 +1,27 @@
+.switch {
+  width: 48px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-muted);
+  position: relative;
+  transition: background-color var(--dur-base) var(--ease-standard);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-inset);
+}
+.switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(17,17,17,0.2);
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+.switch--on {
+  background: var(--color-invert);
+}
+.switch--on .switch__thumb {
+  transform: translateX(20px);
+}
