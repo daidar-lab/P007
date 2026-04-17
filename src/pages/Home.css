@@ -84,6 +84,18 @@
 }
 .wizard-actions .btn { width: 100%; }
 
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--color-text-on-invert);
+  animation: spinner-rotate 720ms linear infinite;
+}
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
 .toast {
   position: fixed;
   left: 50%;

@@ -70,7 +70,9 @@ const emptyForm = () => {
 export default function Home() {
   const [form, setForm] = useState(emptyForm)
   const [step, setStep] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
+  const [sentCount, setSentCount] = useState(0)
 
   const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
   const onInput = (k) => (e) => set(k)(e.target.value)
@@ -133,13 +135,25 @@ export default function Home() {
   const goBack = () => setStep(s => Math.max(0, s - 1))
   const goNext = () => setStep(s => Math.min(STEPS.length - 1, s + 1))
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    if (!canAdvance()) return
+    if (!canAdvance() || submitting) return
+    setSubmitting(true)
+
+    // Simula envio do comunicado e upload das fotos.
+    // Dados do formulário: ~600ms. Cada foto: +400ms (máx. 5s no total).
+    const photoCount = form.fotos.length
+    const delay = Math.min(600 + photoCount * 400, 5000)
+    await new Promise(resolve => setTimeout(resolve, delay))
+
     console.log('Comunicado de Intervenção:', form)
+
+    form.fotos.forEach(p => URL.revokeObjectURL(p.src))
+    setSubmitting(false)
+    setSentCount(photoCount)
     setSent(true)
+
     setTimeout(() => {
-      form.fotos.forEach(p => URL.revokeObjectURL(p.src))
       setSent(false)
       setForm(emptyForm())
       setStep(0)
@@ -332,7 +346,7 @@ export default function Home() {
           variant="secondary"
           size="md"
           onClick={goBack}
-          disabled={step === 0}
+          disabled={step === 0 || submitting}
           icon={<ChevronLeft width={18} height={18} />}
         >
           Voltar
@@ -343,9 +357,14 @@ export default function Home() {
             type="submit"
             variant="primary"
             size="md"
-            disabled={!canAdvance()}
+            disabled={!canAdvance() || submitting}
+            icon={submitting ? <span className="spinner" aria-hidden="true" /> : null}
           >
-            Enviar Comunicado
+            {submitting
+              ? (form.fotos.length > 0
+                  ? `Enviando ${form.fotos.length} ${form.fotos.length === 1 ? 'foto' : 'fotos'}…`
+                  : 'Enviando…')
+              : 'Enviar Comunicado'}
           </Button>
         ) : (
           <Button
@@ -363,7 +382,9 @@ export default function Home() {
 
       {sent && (
         <div className="toast" role="status">
-          Comunicado registrado. Obrigado pelo reporte.
+          {sentCount > 0
+            ? `Comunicado registrado com ${sentCount} ${sentCount === 1 ? 'foto' : 'fotos'}.`
+            : 'Comunicado registrado. Obrigado pelo reporte.'}
         </div>
       )}
     </form>
