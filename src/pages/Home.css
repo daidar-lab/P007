@@ -64,6 +64,16 @@
   line-height: var(--lh-snug);
 }
 
+.required-hint {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-4);
+  text-align: center;
+  font-size: var(--fs-12);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-pill);
+}
+
 .wizard-actions {
   display: grid;
   grid-template-columns: auto 1fr;

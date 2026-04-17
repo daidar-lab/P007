@@ -88,11 +88,37 @@ export default function Home() {
     set('hora')(value)
   }
 
+  const filled = (v) => typeof v === 'string' ? v.trim().length > 0 : !!v
+
   const canAdvance = () => {
     switch (step) {
-      case 0: return !!form.classificacao
-      case 4: return !!form.altoRisco && !!form.descricao.trim()
-      default: return true
+      case 0:
+        return filled(form.classificacao)
+      case 1:
+        return (
+          filled(form.empresa) &&
+          filled(form.data) &&
+          filled(form.hora) &&
+          filled(form.area) &&
+          filled(form.setor) &&
+          filled(form.atividade)
+        )
+      case 2:
+        return (
+          filled(form.intervencaoPor) &&
+          filled(form.matricula) &&
+          filled(form.funcao)
+        )
+      case 3:
+        return form.observacoes.length > 0 && filled(form.outros)
+      case 4:
+        return (
+          filled(form.descricao) &&
+          filled(form.acoes) &&
+          filled(form.altoRisco)
+        )
+      default:
+        return true
     }
   }
 
@@ -160,7 +186,7 @@ export default function Home() {
               />
             </Field>
             <FieldRow>
-              <Field label="Data" hint="Não pode ser futura">
+              <Field label="Data" hint="Não pode ser futura" required>
                 <TextField
                   type="date"
                   value={form.data}
@@ -168,7 +194,7 @@ export default function Home() {
                   onChange={onDataChange}
                 />
               </Field>
-              <Field label="Hora" hint="Não pode ser futura">
+              <Field label="Hora" hint="Não pode ser futura" required>
                 <TextField
                   type="time"
                   value={form.hora}
@@ -177,13 +203,13 @@ export default function Home() {
                 />
               </Field>
             </FieldRow>
-            <Field label="Área onde a intervenção foi realizada">
+            <Field label="Área onde a intervenção foi realizada" required>
               <TextField value={form.area} onChange={onInput('area')} placeholder="Ex.: Área de produção" />
             </Field>
-            <Field label="Setor onde a intervenção foi realizada">
+            <Field label="Setor onde a intervenção foi realizada" required>
               <TextField value={form.setor} onChange={onInput('setor')} placeholder="Ex.: Linha 02" />
             </Field>
-            <Field label="Atividade realizada no momento da intervenção">
+            <Field label="Atividade realizada no momento da intervenção" required>
               <TextArea value={form.atividade} onChange={onInput('atividade')} placeholder="Descreva a atividade em andamento" />
             </Field>
           </Card>
@@ -191,14 +217,14 @@ export default function Home() {
 
         {step === 2 && (
           <Card padding="lg" className="stack stack-md">
-            <Field label="Intervenção realizada por">
+            <Field label="Intervenção realizada por" required>
               <TextField value={form.intervencaoPor} onChange={onInput('intervencaoPor')} placeholder="Nome completo" />
             </Field>
             <FieldRow>
-              <Field label="Matrícula">
+              <Field label="Matrícula" required>
                 <TextField value={form.matricula} onChange={onInput('matricula')} placeholder="000000" inputMode="numeric" />
               </Field>
-              <Field label="Função">
+              <Field label="Função" required>
                 <TextField value={form.funcao} onChange={onInput('funcao')} placeholder="Ex.: Técnico" />
               </Field>
             </FieldRow>
@@ -207,13 +233,14 @@ export default function Home() {
 
         {step === 3 && (
           <div className="stack stack-md">
-            <p className="step-hint">Marque todos os itens que se aplicam ao que você observou.</p>
-            <CheckboxGroup
-              value={form.observacoes}
-              onChange={set('observacoes')}
-              options={OBSERVACAO_OPTIONS}
-            />
-            <Field label="Outros">
+            <Field label="Itens observados" hint="Marque ao menos um item" required>
+              <CheckboxGroup
+                value={form.observacoes}
+                onChange={set('observacoes')}
+                options={OBSERVACAO_OPTIONS}
+              />
+            </Field>
+            <Field label="Outros" required>
               <TextField value={form.outros} onChange={onInput('outros')} placeholder="Descreva outra condição observada" />
             </Field>
           </div>
@@ -230,7 +257,7 @@ export default function Home() {
                   placeholder="O que aconteceu, quando e onde"
                 />
               </Field>
-              <Field label="O que fiz a respeito (ações imediatas)">
+              <Field label="O que fiz a respeito (ações imediatas)" required>
                 <TextArea
                   rows={5}
                   value={form.acoes}
@@ -260,6 +287,12 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {!canAdvance() && (
+        <p className="required-hint">
+          Preencha todos os campos desta etapa para continuar.
+        </p>
+      )}
 
       <div className="wizard-actions">
         <Button
