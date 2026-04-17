@@ -1,0 +1,55 @@
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-inset);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.check:hover { background: var(--color-surface-muted); }
+.check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.check__box {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1.5px var(--color-border-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  flex-shrink: 0;
+  transition:
+    background-color var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard),
+    color var(--dur-base) var(--ease-standard);
+}
+.check__label {
+  font-size: var(--fs-14);
+  color: var(--color-text);
+  line-height: var(--lh-snug);
+}
+.check.is-active .check__box {
+  background: var(--color-invert);
+  color: var(--color-text-on-invert);
+  box-shadow: none;
+}
+.check:focus-within {
+  outline: 2px solid var(--color-invert);
+  outline-offset: 2px;
+  border-radius: var(--radius-pill);
+}

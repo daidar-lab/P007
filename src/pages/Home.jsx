@@ -1,150 +1,261 @@
 import { useState } from 'react'
 import Header from '../components/Header.jsx'
-import SearchBar from '../components/SearchBar.jsx'
 import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
-import { List } from '../components/ListItem.jsx'
-import ListItem from '../components/ListItem.jsx'
-import Avatar from '../components/Avatar.jsx'
-import Badge from '../components/Badge.jsx'
-import Switch from '../components/Switch.jsx'
-import SegmentedControl from '../components/SegmentedControl.jsx'
-import TabBar from '../components/TabBar.jsx'
-import {
-  Plus, Bell, Home as HomeIcon, Compass, Heart, User,
-  Moon, Lock, Globe, Card as CardIcon, Settings
-} from '../components/Icon.jsx'
+import Field, { FieldRow } from '../components/Field.jsx'
+import TextField from '../components/TextField.jsx'
+import TextArea from '../components/TextArea.jsx'
+import RadioGroup from '../components/RadioGroup.jsx'
+import CheckboxGroup from '../components/CheckboxGroup.jsx'
 import './Home.css'
 
+const OBSERVACAO_OPTIONS = [
+  { value: 'condicao_estrutural', label: 'Condição estrutural do local ou equipamento' },
+  { value: 'permissao_trabalho',  label: 'Permissão de Trabalho e/ou procedimentos' },
+  { value: 'movimentacao_cargas', label: 'Elevação e Movimentação de Cargas' },
+  { value: 'espaco_confinado',    label: 'Espaço Confinado' },
+  { value: 'loto',                label: 'LOTO — Bloqueio de Energias Perigosas (Lock Out / Tag Out)' },
+  { value: 'eletricidade',        label: 'Serviço em eletricidade' },
+  { value: 'trabalho_quente',     label: 'Trabalho à Quente' },
+  { value: 'trabalho_altura',     label: 'Trabalho em Altura' },
+  { value: 'epi_epc',             label: "Uso de EPI's / EPC's" },
+  { value: 'produtos_quimicos',   label: 'Produtos Químicos' },
+  { value: 'escavacao',           label: 'Escavação / Perfuração / Demolição' },
+  { value: 'meio_ambiente',       label: 'Meio Ambiente' },
+]
+
+const EMPTY = {
+  classificacao: '',
+  empresa: '', unidade: '',
+  data: '', hora: '', turno: '',
+  area: '', setor: '',
+  atividade: '',
+  intervencaoPor: '',
+  matricula: '', funcao: '',
+  observacoes: [], outros: '',
+  descricao: '',
+  acoes: '',
+  altoRisco: '',
+}
+
 export default function Home() {
-  const [segment, setSegment] = useState('hoje')
-  const [tab, setTab] = useState('home')
+  const [form, setForm] = useState(EMPTY)
+  const [sent, setSent] = useState(false)
+
+  const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
+  const onInput = (k) => (e) => set(k)(e.target.value)
+
+  const submit = (e) => {
+    e.preventDefault()
+    console.log('Comunicado de Intervenção:', form)
+    setSent(true)
+    setTimeout(() => setSent(false), 3500)
+  }
 
   return (
-    <>
-      <div className="screen">
-        <Header
-          leading={<Avatar name="AR" size={36} />}
-          title="Bom dia, Ana"
-          subtitle="Quarta, 17 abr"
-          trailing={
-            <Button variant="secondary" size="sm" icon={<Bell width={18} height={18} />} aria-label="Notificações" />
-          }
-        />
-
-        <SearchBar placeholder="Buscar ações, pessoas, lugares" />
-
-        <SegmentedControl
-          value={segment}
-          onChange={setSegment}
-          options={[
-            { value: 'hoje', label: 'Hoje' },
-            { value: 'semana', label: 'Semana' },
-            { value: 'mes', label: 'Mês' },
-          ]}
-        />
-
-        <Card elevated padding="lg">
-          <div className="row row-between">
-            <span className="text-section">Saldo</span>
-            <Badge variant="outline">Conta principal</Badge>
-          </div>
-          <div className="balance">
-            <span className="balance__value">R$ 12.480</span>
-            <span className="balance__decimals">,32</span>
-          </div>
-          <p className="text-muted" style={{ margin: '4px 0 20px' }}>
-            +R$ 248,90 hoje · 12 transações
-          </p>
-          <div className="row row-gap-3">
-            <Button variant="primary" icon={<Plus width={18} height={18} />}>Enviar</Button>
-            <Button variant="secondary">Receber</Button>
-            <Button variant="ghost" size="md" icon={<Settings width={18} height={18} />} aria-label="Ajustes" />
-          </div>
-        </Card>
-
-        <section className="stack stack-md">
-          <div className="row row-between">
-            <h2 className="text-title" style={{ margin: 0 }}>Atalhos</h2>
-            <button className="link">Ver todos</button>
-          </div>
-          <div className="shortcuts">
-            {[
-              { icon: <CardIcon />, label: 'Cartões' },
-              { icon: <Globe />, label: 'Câmbio' },
-              { icon: <Lock />, label: 'Cofre' },
-              { icon: <Heart />, label: 'Favoritos' },
-            ].map(s => (
-              <button key={s.label} className="shortcut">
-                <span className="shortcut__icon">{s.icon}</span>
-                <span className="shortcut__label">{s.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="stack stack-md">
-          <h2 className="text-title" style={{ margin: 0 }}>Ajustes</h2>
-          <List>
-            <ListItem
-              leading={<Moon width={18} height={18} />}
-              title="Aparência"
-              subtitle="Automático"
-              trailing={<span>Sistema</span>}
-              showChevron
-            />
-            <ListItem
-              leading={<Bell width={18} height={18} />}
-              title="Notificações"
-              subtitle="Push, e-mail e SMS"
-              trailing={<Switch defaultChecked />}
-            />
-            <ListItem
-              leading={<Lock width={18} height={18} />}
-              title="Privacidade"
-              subtitle="Face ID ativo"
-              showChevron
-            />
-            <ListItem
-              leading={<Globe width={18} height={18} />}
-              title="Idioma"
-              trailing={<span>Português</span>}
-              showChevron
-            />
-          </List>
-        </section>
-
-        <section className="stack stack-md">
-          <h2 className="text-title" style={{ margin: 0 }}>Pessoas</h2>
-          <List>
-            {[
-              { n: 'Marina Alves', s: 'Enviou R$ 120,00', t: '09:24' },
-              { n: 'Pedro Lima',   s: 'Solicitou R$ 45,00', t: '08:57' },
-              { n: 'Júlia Rocha',  s: 'Você enviou R$ 300', t: 'Ontem' },
-            ].map(p => (
-              <ListItem
-                key={p.n}
-                leading={<Avatar name={p.n} size={36} />}
-                title={p.n}
-                subtitle={p.s}
-                trailing={<span className="text-subtle">{p.t}</span>}
-                showChevron
-              />
-            ))}
-          </List>
-        </section>
-
-        <TabBar
-          value={tab}
-          onChange={setTab}
-          items={[
-            { value: 'home',    label: 'Início',  icon: <HomeIcon width={20} height={20} /> },
-            { value: 'explore', label: 'Explorar',icon: <Compass width={20} height={20} /> },
-            { value: 'favs',    label: 'Favoritos',icon: <Heart width={20} height={20} /> },
-            { value: 'me',      label: 'Perfil',  icon: <User width={20} height={20} /> },
-          ]}
-        />
+    <form className="screen" onSubmit={submit} noValidate>
+      <div className="brand">
+        <div className="brand__logo">CI</div>
+        <div>
+          <p className="brand__name">Cidade Imperial</p>
+          <p className="brand__tag">Segurança do Trabalho · Interno</p>
+        </div>
       </div>
-    </>
+
+      <Header
+        title="Comunicado de Intervenção"
+        subtitle="Condições e comportamentos inseguros"
+      />
+
+      <Card elevated padding="lg" className="stack stack-md">
+        <Field label="Classificação" required>
+          <RadioGroup
+            name="classificacao"
+            value={form.classificacao}
+            onChange={set('classificacao')}
+            options={[
+              { value: 'comportamento', label: 'Comportamento Inseguro' },
+              { value: 'condicao',      label: 'Condição Insegura' },
+              { value: 'quase_acidente',label: 'Quase Acidente' },
+            ]}
+          />
+        </Field>
+      </Card>
+
+      <section className="stack stack-md">
+        <h2 className="section-title">Identificação</h2>
+        <Card padding="lg" className="stack stack-md">
+          <FieldRow>
+            <Field label="Empresa">
+              <TextField
+                value={form.empresa}
+                onChange={onInput('empresa')}
+                placeholder="Ex.: Cidade Imperial"
+              />
+            </Field>
+            <Field label="Unidade">
+              <TextField
+                value={form.unidade}
+                onChange={onInput('unidade')}
+                placeholder="Ex.: Matriz"
+              />
+            </Field>
+          </FieldRow>
+
+          <FieldRow>
+            <Field label="Data">
+              <TextField type="date" value={form.data} onChange={onInput('data')} />
+            </Field>
+            <Field label="Hora">
+              <TextField type="time" value={form.hora} onChange={onInput('hora')} />
+            </Field>
+          </FieldRow>
+
+          <Field label="Turno">
+            <RadioGroup
+              name="turno"
+              value={form.turno}
+              onChange={set('turno')}
+              options={[
+                { value: '1', label: '1º' },
+                { value: '2', label: '2º' },
+                { value: '3', label: '3º' },
+                { value: 'adm', label: 'ADM' },
+              ]}
+            />
+          </Field>
+
+          <Field label="Área onde a intervenção foi realizada">
+            <TextField
+              value={form.area}
+              onChange={onInput('area')}
+              placeholder="Ex.: Área de produção"
+            />
+          </Field>
+
+          <Field label="Setor onde a intervenção foi realizada">
+            <TextField
+              value={form.setor}
+              onChange={onInput('setor')}
+              placeholder="Ex.: Linha 02"
+            />
+          </Field>
+
+          <Field label="Atividade realizada no momento da intervenção">
+            <TextArea
+              value={form.atividade}
+              onChange={onInput('atividade')}
+              placeholder="Descreva a atividade em andamento"
+            />
+          </Field>
+        </Card>
+      </section>
+
+      <section className="stack stack-md">
+        <h2 className="section-title">Responsável pela intervenção</h2>
+        <Card padding="lg" className="stack stack-md">
+          <Field label="Intervenção realizada por">
+            <TextField
+              value={form.intervencaoPor}
+              onChange={onInput('intervencaoPor')}
+              placeholder="Nome completo"
+            />
+          </Field>
+          <FieldRow>
+            <Field label="Matrícula">
+              <TextField
+                value={form.matricula}
+                onChange={onInput('matricula')}
+                placeholder="000000"
+                inputMode="numeric"
+              />
+            </Field>
+            <Field label="Função">
+              <TextField
+                value={form.funcao}
+                onChange={onInput('funcao')}
+                placeholder="Ex.: Técnico"
+              />
+            </Field>
+          </FieldRow>
+        </Card>
+      </section>
+
+      <section className="stack stack-md">
+        <h2 className="section-title">O que observei?</h2>
+        <CheckboxGroup
+          value={form.observacoes}
+          onChange={set('observacoes')}
+          options={OBSERVACAO_OPTIONS}
+        />
+        <Field label="Outros">
+          <TextField
+            value={form.outros}
+            onChange={onInput('outros')}
+            placeholder="Descreva outra condição observada"
+          />
+        </Field>
+      </section>
+
+      <section className="stack stack-md">
+        <h2 className="section-title">Relato</h2>
+        <Card padding="lg" className="stack stack-md">
+          <Field label="Breve descrição do que foi observado">
+            <TextArea
+              rows={5}
+              value={form.descricao}
+              onChange={onInput('descricao')}
+              placeholder="O que aconteceu, quando e onde"
+            />
+          </Field>
+          <Field label="O que fiz a respeito (ações imediatas)">
+            <TextArea
+              rows={5}
+              value={form.acoes}
+              onChange={onInput('acoes')}
+              placeholder="Ação tomada no momento"
+            />
+          </Field>
+        </Card>
+      </section>
+
+      <Card elevated padding="lg">
+        <Field label="A classificação deste reporte é de Alto Risco Potencial?" required>
+          <RadioGroup
+            name="altoRisco"
+            value={form.altoRisco}
+            onChange={set('altoRisco')}
+            options={[
+              { value: 'sim', label: 'Sim' },
+              { value: 'nao', label: 'Não' },
+            ]}
+          />
+        </Field>
+      </Card>
+
+      <div className="stack stack-sm" style={{ marginTop: 'var(--space-2)' }}>
+        <Button type="submit" variant="primary" size="lg" full>
+          Enviar Comunicado
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="md"
+          full
+          onClick={() => setForm(EMPTY)}
+        >
+          Limpar formulário
+        </Button>
+        <p className="disclaimer">
+          Entregar o Comunicado de Intervenção à Segurança do Trabalho.
+        </p>
+      </div>
+
+      {sent && (
+        <div className="toast" role="status">
+          Comunicado registrado. Obrigado pelo reporte.
+        </div>
+      )}
+    </form>
   )
 }

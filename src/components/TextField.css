@@ -1,0 +1,34 @@
+.textfield {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-4);
+  border: 0;
+  outline: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-15);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-inset);
+  transition: box-shadow var(--dur-base) var(--ease-standard);
+}
+.textfield::placeholder { color: var(--color-text-tertiary); }
+.textfield:focus { box-shadow: 0 0 0 2px var(--color-invert); }
+.textfield:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  outline: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inset);
+  resize: vertical;
+  transition: box-shadow var(--dur-base) var(--ease-standard);
+}
+.textarea::placeholder { color: var(--color-text-tertiary); }
+.textarea:focus { box-shadow: 0 0 0 2px var(--color-invert); }
