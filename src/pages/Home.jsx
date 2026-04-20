@@ -289,9 +289,10 @@ export default function Home() {
   })
 
   const submit = async (e) => {
-    e.preventDefault()
+    // Pode ser chamado pelo onClick do botão ou pelo onSubmit do form.
+    // Em ambos os casos, impede qualquer comportamento default e revalida.
+    if (e && typeof e.preventDefault === 'function') e.preventDefault()
     // Só envia quando o usuário está na última etapa (Fotos & envio).
-    // Evita que Enter em qualquer campo de texto dispare o envio antes da hora.
     if (step !== STEPS.length - 1) return
     if (!canAdvance() || submitting) return
 
@@ -349,7 +350,7 @@ export default function Home() {
   const isLast = step === STEPS.length - 1
 
   return (
-    <form className="screen" onSubmit={submit} noValidate>
+    <form className="screen" onSubmit={(e) => e.preventDefault()} noValidate>
       <div className="brand">
         <div className="brand__logo">CI</div>
         <div>
@@ -590,9 +591,10 @@ export default function Home() {
 
         {isLast ? (
           <Button
-            type="submit"
+            type="button"
             variant="primary"
             size="md"
+            onClick={submit}
             disabled={!canAdvance() || submitting}
             icon={submitting ? <span className="spinner" aria-hidden="true" /> : null}
           >
