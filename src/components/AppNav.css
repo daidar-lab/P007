@@ -1,0 +1,30 @@
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 2px;
+  padding: var(--space-3) 0;
+  background: var(--color-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.app-nav__item {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-muted);
+  transition:
+    background-color var(--dur-base) var(--ease-standard),
+    color var(--dur-base) var(--ease-standard);
+}
+.app-nav__item.is-active {
+  background: var(--color-invert);
+  color: var(--color-text-on-invert);
+}
+.app-nav__item:hover:not(.is-active) {
+  color: var(--color-text);
+}

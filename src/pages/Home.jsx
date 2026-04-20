@@ -95,7 +95,7 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false
     setClassifStatus('loading')
-    getClassificacoes()
+    getClassificacoes(true)
       .then(rows => {
         if (cancelled) return
         setClassificacoes(rows.map(r => ({
