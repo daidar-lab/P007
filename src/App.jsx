@@ -11,7 +11,8 @@ import AreasCrud from './pages/AreasCrud.jsx'
 import SetoresCrud from './pages/SetoresCrud.jsx'
 import ItensObservadosCrud from './pages/ItensObservadosCrud.jsx'
 import { useHashRoute } from './lib/router.js'
-import { getUser, clearSession } from './lib/auth.js'
+import { getToken, clearSession } from './lib/auth.js'
+import { getMe } from './lib/api.js'
 
 function renderRoute(route) {
   if (route === 'home' || route === '')            return <Home />
@@ -29,8 +30,26 @@ function renderRoute(route) {
 
 export default function App() {
   const route = useHashRoute()
-  const [user, setUser] = useState(getUser())
+  const [user, setUser] = useState(null)
+  const [ready, setReady] = useState(false)
 
+  // Valida a sessão contra a API no primeiro render.
+  // Enquanto não conclui, NÃO renderiza nem Login nem o app.
+  useEffect(() => {
+    let cancelled = false
+    const token = getToken()
+    if (!token) {
+      if (!cancelled) setReady(true)
+      return
+    }
+    getMe()
+      .then(u => { if (!cancelled) setUser(u) })
+      .catch(() => { if (!cancelled) clearSession() })
+      .finally(() => { if (!cancelled) setReady(true) })
+    return () => { cancelled = true }
+  }, [])
+
+  // Reagir a login/logout emitidos por outros pontos da app
   useEffect(() => {
     const onLogin  = (e) => setUser(e.detail)
     const onLogout = ()  => setUser(null)
@@ -43,6 +62,15 @@ export default function App() {
   }, [])
 
   const logout = () => clearSession()
+
+  // Splash enquanto valida o token (curto — um round-trip)
+  if (!ready) {
+    return (
+      <div className="auth-splash">
+        <div className="auth-splash__logo">CI</div>
+      </div>
+    )
+  }
 
   if (!user) return <Login />
 

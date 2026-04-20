@@ -102,3 +102,31 @@ a { color: inherit; text-decoration: none; }
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
+
+/* Splash enquanto valida a sessão no primeiro render */
+.auth-splash {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+}
+.auth-splash__logo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-20);
+  letter-spacing: 0.04em;
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  animation: auth-splash-pulse 1.4s ease-in-out infinite;
+}
+@keyframes auth-splash-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1;   }
+  50%      { transform: scale(0.94); opacity: 0.8; }
+}
