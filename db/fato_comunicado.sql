@@ -1,7 +1,8 @@
 -- Fato: fato_comunicado
 -- Armazena cada Comunicado de Intervenção preenchido no formulário.
 -- Cada linha referencia as dimensões (classificação, filial, área, setor)
--- por FK. Os itens observados ficam em um array de ids de dim_item_observado.
+-- por FK e mantém uma relação N:N com dim_item_observado na tabela-ponte
+-- definida mais abaixo.
 
 CREATE TABLE fato_comunicado (
     id                      SERIAL        PRIMARY KEY,
@@ -24,9 +25,6 @@ CREATE TABLE fato_comunicado (
     matricula               VARCHAR(20)   NOT NULL,
     funcao                  VARCHAR(80)   NOT NULL,
 
-    -- Itens do checklist "O que observei?" — ids de dim_item_observado
-    itens_observados_ids    INT[]         NOT NULL,
-
     -- Preenchido SOMENTE quando o usuário marca "Outros" no checklist
     outros_descricao        VARCHAR(200),
 
@@ -38,10 +36,7 @@ CREATE TABLE fato_comunicado (
     alto_risco_potencial    BOOLEAN       NOT NULL,
 
     -- Auditoria
-    criado_em               TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT ck_fato_comunicado_itens_nao_vazio
-        CHECK (array_length(itens_observados_ids, 1) >= 1)
+    criado_em               TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX ix_fato_comunicado_data           ON fato_comunicado (data_comunicado);
@@ -50,7 +45,14 @@ CREATE INDEX ix_fato_comunicado_area           ON fato_comunicado (area_id);
 CREATE INDEX ix_fato_comunicado_setor          ON fato_comunicado (setor_id);
 CREATE INDEX ix_fato_comunicado_classificacao  ON fato_comunicado (classificacao_id);
 
--- Índice GIN para consultas do tipo "comunicados que marcaram o item X"
--- Uso:   WHERE itens_observados_ids @> ARRAY[5]::int[]
-CREATE INDEX ix_fato_comunicado_itens_observados
-    ON fato_comunicado USING GIN (itens_observados_ids);
+
+-- Ponte N:N — um comunicado pode marcar vários itens observados.
+CREATE TABLE fato_comunicado_item_observado (
+    comunicado_id       INT  NOT NULL REFERENCES fato_comunicado    (id) ON DELETE CASCADE,
+    item_observado_id   INT  NOT NULL REFERENCES dim_item_observado (id),
+
+    PRIMARY KEY (comunicado_id, item_observado_id)
+);
+
+CREATE INDEX ix_fato_comunicado_item_obs_item
+    ON fato_comunicado_item_observado (item_observado_id);
