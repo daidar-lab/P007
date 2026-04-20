@@ -16,23 +16,9 @@ import {
   getFiliais,
   getAreas,
   getSetores,
+  getItensObservados,
 } from '../lib/api.js'
 import './Home.css'
-
-const OBSERVACAO_OPTIONS = [
-  { value: 'condicao_estrutural', label: 'Condição estrutural do local ou equipamento' },
-  { value: 'permissao_trabalho',  label: 'Permissão de Trabalho e/ou procedimentos' },
-  { value: 'movimentacao_cargas', label: 'Elevação e Movimentação de Cargas' },
-  { value: 'espaco_confinado',    label: 'Espaço Confinado' },
-  { value: 'loto',                label: 'LOTO — Bloqueio de Energias Perigosas (Lock Out / Tag Out)' },
-  { value: 'eletricidade',        label: 'Serviço em eletricidade' },
-  { value: 'trabalho_quente',     label: 'Trabalho à Quente' },
-  { value: 'trabalho_altura',     label: 'Trabalho em Altura' },
-  { value: 'epi_epc',             label: "Uso de EPI's / EPC's" },
-  { value: 'produtos_quimicos',   label: 'Produtos Químicos' },
-  { value: 'escavacao',           label: 'Escavação / Perfuração / Demolição' },
-  { value: 'meio_ambiente',       label: 'Meio Ambiente' },
-]
 
 const STEPS = [
   'Classificação',
@@ -173,6 +159,50 @@ export default function Home() {
     return () => { cancelled = true }
   }, [form.area])
 
+  // Itens observados (para o checklist da Etapa 4)
+  const [itensObservados, setItensObservados] = useState([])
+  const [itensStatus, setItensStatus] = useState('loading')
+  const [itensError, setItensError] = useState('')
+  const [outrosId, setOutrosId] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setItensStatus('loading')
+    getItensObservados(true)
+      .then(rows => {
+        if (cancelled) return
+        setItensObservados(rows)
+        const outros = rows.find(r => r.descricao.trim().toLowerCase() === 'outros')
+        setOutrosId(outros ? String(outros.id) : null)
+        setItensStatus('ok')
+      })
+      .catch(err => {
+        if (cancelled) return
+        setItensError(err.message || 'Falha ao carregar')
+        setItensStatus('error')
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  // Opções do CheckboxGroup: "Outros" ganha o input inline condicional
+  const itensObservadosOptions = itensObservados.map(r => {
+    const base = { value: String(r.id), label: r.descricao }
+    if (String(r.id) === outrosId) {
+      return {
+        ...base,
+        extra: (
+          <TextField
+            value={form.outros}
+            onChange={onInput('outros')}
+            placeholder="Descreva outra condição observada"
+            autoFocus
+          />
+        ),
+      }
+    }
+    return base
+  })
+
   // Quando o usuário troca filial, zera área e setor (evita seleção inconsistente)
   const onEmpresaChange = (v) => {
     setForm(f => ({ ...f, empresa: v, area: '', setor: '' }))
@@ -226,7 +256,7 @@ export default function Home() {
         )
       case 3: {
         if (form.observacoes.length === 0) return false
-        if (form.observacoes.includes('outros') && !filled(form.outros)) return false
+        if (outrosId && form.observacoes.includes(outrosId) && !filled(form.outros)) return false
         return true
       }
       case 4:
@@ -417,25 +447,21 @@ export default function Home() {
 
         {step === 3 && (
           <Field label="Itens observados" hint="Marque ao menos um item" required>
-            <CheckboxGroup
-              value={form.observacoes}
-              onChange={set('observacoes')}
-              options={[
-                ...OBSERVACAO_OPTIONS,
-                {
-                  value: 'outros',
-                  label: 'Outros',
-                  extra: (
-                    <TextField
-                      value={form.outros}
-                      onChange={onInput('outros')}
-                      placeholder="Descreva outra condição observada"
-                      autoFocus
-                    />
-                  ),
-                },
-              ]}
-            />
+            {itensStatus === 'loading' && (
+              <p className="text-muted">Carregando itens…</p>
+            )}
+            {itensStatus === 'error' && (
+              <p className="text-muted" style={{ color: 'var(--color-accent-danger)' }}>
+                Não foi possível carregar: {itensError}
+              </p>
+            )}
+            {itensStatus === 'ok' && (
+              <CheckboxGroup
+                value={form.observacoes}
+                onChange={set('observacoes')}
+                options={itensObservadosOptions}
+              />
+            )}
           </Field>
         )}
 
