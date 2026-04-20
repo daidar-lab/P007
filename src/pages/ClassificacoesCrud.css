@@ -32,3 +32,37 @@
   color: #FFFFFF;
 }
 .btn--danger:hover { background: #962219; }
+
+/* ------- Agrupamento em listas (filial / área) ------- */
+.group-filial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.group-filial + .group-filial { margin-top: var(--space-5); }
+
+.group-filial__title {
+  margin: 0;
+  padding: 0 var(--space-2);
+  font-size: var(--fs-17);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--color-text);
+}
+
+.group-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.group-area + .group-area { margin-top: var(--space-3); }
+
+.group-area__title {
+  margin: 0;
+  padding: 0 var(--space-2);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}

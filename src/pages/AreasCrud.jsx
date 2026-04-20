@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Header from '../components/Header.jsx'
 import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
@@ -60,6 +60,21 @@ export default function AreasCrud() {
     value: String(f.id),
     label: f.descricao,
   }))
+
+  const groupedByFilial = useMemo(() => {
+    const map = new Map()
+    for (const item of list) {
+      if (!map.has(item.filial_id)) {
+        map.set(item.filial_id, {
+          filial_id: item.filial_id,
+          filial_descricao: item.filial_descricao,
+          items: [],
+        })
+      }
+      map.get(item.filial_id).items.push(item)
+    }
+    return Array.from(map.values())
+  }, [list])
 
   const startNew = () => {
     setDraft(emptyDraft())
@@ -272,22 +287,28 @@ export default function AreasCrud() {
       )}
 
       {status === 'ok' && list.length > 0 && (
-        <List>
-          {list.map(item => (
-            <ListItem
-              key={item.id}
-              title={item.descricao}
-              subtitle={`Filial: ${item.filial_descricao}`}
-              trailing={
-                <Badge variant={item.ativo ? 'solid' : 'soft'}>
-                  {item.ativo ? 'Ativa' : 'Inativa'}
-                </Badge>
-              }
-              showChevron
-              onClick={() => startEdit(item)}
-            />
+        <div className="stack stack-lg">
+          {groupedByFilial.map(g => (
+            <section key={g.filial_id} className="group-filial">
+              <h3 className="group-filial__title">{g.filial_descricao}</h3>
+              <List>
+                {g.items.map(item => (
+                  <ListItem
+                    key={item.id}
+                    title={item.descricao}
+                    trailing={
+                      <Badge variant={item.ativo ? 'solid' : 'soft'}>
+                        {item.ativo ? 'Ativa' : 'Inativa'}
+                      </Badge>
+                    }
+                    showChevron
+                    onClick={() => startEdit(item)}
+                  />
+                ))}
+              </List>
+            </section>
           ))}
-        </List>
+        </div>
       )}
     </div>
   )

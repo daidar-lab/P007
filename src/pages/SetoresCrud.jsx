@@ -65,6 +65,33 @@ export default function SetoresCrud() {
     () => filiais.map(f => ({ value: String(f.id), label: f.descricao })),
     [filiais]
   )
+  const groupedByFilialAndArea = useMemo(() => {
+    const filialMap = new Map()
+    for (const item of list) {
+      if (!filialMap.has(item.filial_id)) {
+        filialMap.set(item.filial_id, {
+          filial_id: item.filial_id,
+          filial_descricao: item.filial_descricao,
+          areas: new Map(),
+        })
+      }
+      const filial = filialMap.get(item.filial_id)
+      if (!filial.areas.has(item.area_id)) {
+        filial.areas.set(item.area_id, {
+          area_id: item.area_id,
+          area_descricao: item.area_descricao,
+          items: [],
+        })
+      }
+      filial.areas.get(item.area_id).items.push(item)
+    }
+    return Array.from(filialMap.values()).map(f => ({
+      filial_id: f.filial_id,
+      filial_descricao: f.filial_descricao,
+      areas: Array.from(f.areas.values()),
+    }))
+  }, [list])
+
   const areasOptionsForFilial = useMemo(() => {
     if (!draft?.filial_id) return []
     return areas
@@ -308,22 +335,33 @@ export default function SetoresCrud() {
       )}
 
       {status === 'ok' && list.length > 0 && (
-        <List>
-          {list.map(item => (
-            <ListItem
-              key={item.id}
-              title={item.descricao}
-              subtitle={`${item.filial_descricao} · ${item.area_descricao}`}
-              trailing={
-                <Badge variant={item.ativo ? 'solid' : 'soft'}>
-                  {item.ativo ? 'Ativo' : 'Inativo'}
-                </Badge>
-              }
-              showChevron
-              onClick={() => startEdit(item)}
-            />
+        <div className="stack stack-lg">
+          {groupedByFilialAndArea.map(fg => (
+            <section key={fg.filial_id} className="group-filial">
+              <h3 className="group-filial__title">{fg.filial_descricao}</h3>
+              {fg.areas.map(ag => (
+                <section key={ag.area_id} className="group-area">
+                  <h4 className="group-area__title">{ag.area_descricao}</h4>
+                  <List>
+                    {ag.items.map(item => (
+                      <ListItem
+                        key={item.id}
+                        title={item.descricao}
+                        trailing={
+                          <Badge variant={item.ativo ? 'solid' : 'soft'}>
+                            {item.ativo ? 'Ativo' : 'Inativo'}
+                          </Badge>
+                        }
+                        showChevron
+                        onClick={() => startEdit(item)}
+                      />
+                    ))}
+                  </List>
+                </section>
+              ))}
+            </section>
           ))}
-        </List>
+        </div>
       )}
     </div>
   )
