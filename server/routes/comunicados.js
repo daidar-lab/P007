@@ -97,6 +97,110 @@ function validatePayload(body) {
   return { data }
 }
 
+// GET /api/comunicados — lista (sem blobs das fotos)
+router.get('/', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT c.id,
+              c.data_comunicado,
+              c.hora_comunicado,
+              c.alto_risco_potencial,
+              c.intervencao_por,
+              c.criado_em,
+              cl.descricao AS classificacao_descricao,
+              f.descricao  AS filial_descricao,
+              a.descricao  AS area_descricao,
+              s.descricao  AS setor_descricao,
+              (SELECT COUNT(*)::int FROM fato_comunicado_foto          WHERE comunicado_id = c.id) AS fotos_count,
+              (SELECT COUNT(*)::int FROM fato_comunicado_item_observado WHERE comunicado_id = c.id) AS itens_count
+         FROM fato_comunicado c
+         JOIN dim_classificacao cl ON cl.id = c.classificacao_id
+         JOIN dim_filial        f  ON f.id  = c.filial_id
+         JOIN dim_area          a  ON a.id  = c.area_id
+         JOIN dim_setor         s  ON s.id  = c.setor_id
+        ORDER BY c.criado_em DESC`
+    )
+    res.json(rows)
+  } catch (err) {
+    console.error('[comunicados] GET / falhou:', err)
+    res.status(500).json({ error: 'Erro ao listar comunicados' })
+  }
+})
+
+// GET /api/comunicados/:id — detalhe completo (metadata das fotos, sem blob)
+router.get('/:id(\\d+)', async (req, res) => {
+  try {
+    const { rows: comunicadoRows } = await pool.query(
+      `SELECT c.id, c.data_comunicado, c.hora_comunicado,
+              c.atividade, c.intervencao_por, c.matricula, c.funcao,
+              c.outros_descricao, c.descricao_observado, c.acoes_imediatas,
+              c.alto_risco_potencial, c.criado_em,
+              c.classificacao_id, c.filial_id, c.area_id, c.setor_id,
+              cl.descricao     AS classificacao_descricao,
+              f.descricao      AS filial_descricao,
+              f.abreviatura    AS filial_abreviatura,
+              f.codigo_protheus,
+              a.descricao      AS area_descricao,
+              s.descricao      AS setor_descricao
+         FROM fato_comunicado c
+         JOIN dim_classificacao cl ON cl.id = c.classificacao_id
+         JOIN dim_filial        f  ON f.id  = c.filial_id
+         JOIN dim_area          a  ON a.id  = c.area_id
+         JOIN dim_setor         s  ON s.id  = c.setor_id
+        WHERE c.id = $1`,
+      [req.params.id]
+    )
+    if (comunicadoRows.length === 0) {
+      return res.status(404).json({ error: 'Comunicado não encontrado' })
+    }
+
+    const { rows: itens } = await pool.query(
+      `SELECT io.id, io.descricao
+         FROM fato_comunicado_item_observado ci
+         JOIN dim_item_observado io ON io.id = ci.item_observado_id
+        WHERE ci.comunicado_id = $1
+        ORDER BY io.id`,
+      [req.params.id]
+    )
+
+    const { rows: fotos } = await pool.query(
+      `SELECT id, nome_original, mime, tamanho_bytes, criado_em
+         FROM fato_comunicado_foto
+        WHERE comunicado_id = $1
+        ORDER BY id`,
+      [req.params.id]
+    )
+
+    res.json({
+      ...comunicadoRows[0],
+      itens_observados: itens,
+      fotos,
+    })
+  } catch (err) {
+    console.error('[comunicados] GET /:id falhou:', err)
+    res.status(500).json({ error: 'Erro ao carregar comunicado' })
+  }
+})
+
+// GET /api/comunicados/:id/fotos/:fotoId — serve o binário da foto
+router.get('/:id(\\d+)/fotos/:fotoId(\\d+)', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT mime, conteudo
+         FROM fato_comunicado_foto
+        WHERE id = $1 AND comunicado_id = $2`,
+      [req.params.fotoId, req.params.id]
+    )
+    if (rows.length === 0) return res.status(404).json({ error: 'Foto não encontrada' })
+    res.setHeader('Content-Type', rows[0].mime)
+    res.setHeader('Cache-Control', 'private, max-age=3600')
+    res.send(rows[0].conteudo)
+  } catch (err) {
+    console.error('[comunicados] GET foto falhou:', err)
+    res.status(500).json({ error: 'Erro ao carregar foto' })
+  }
+})
+
 // POST /api/comunicados
 router.post('/', async (req, res) => {
   const parsed = validatePayload(req.body)

@@ -115,3 +115,12 @@ export const deleteItemObservado = (id) =>
 // ---------- Comunicados (fato_comunicado) ----------
 export const createComunicado = (data) =>
   request('/api/comunicados', { method: 'POST', ...jsonBody(data) })
+
+export const getComunicados = () =>
+  request('/api/comunicados')
+
+export const getComunicado = (id) =>
+  request(`/api/comunicados/${id}`)
+
+export const comunicadoFotoUrl = (comunicadoId, fotoId) =>
+  `${apiBase}/api/comunicados/${comunicadoId}/fotos/${fotoId}`

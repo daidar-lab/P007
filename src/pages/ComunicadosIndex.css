@@ -1,0 +1,14 @@
+.comunicado-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.comunicado-meta__fotos {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-tertiary);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-medium);
+}

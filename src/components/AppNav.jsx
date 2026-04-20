@@ -14,6 +14,13 @@ export default function AppNav({ route }) {
       </button>
       <button
         type="button"
+        className={`app-nav__item${section === 'comunicados' ? ' is-active' : ''}`}
+        onClick={() => navigate('comunicados')}
+      >
+        Histórico
+      </button>
+      <button
+        type="button"
         className={`app-nav__item${section === 'cadastros' ? ' is-active' : ''}`}
         onClick={() => navigate('cadastros')}
       >
