@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Comunicado de Intervenção">
+  <!-- Fundo: preto da marca com cantos arredondados (estilo iOS squircle) -->
+  <rect width="512" height="512" rx="112" fill="#272525"/>
+
+  <!-- Cruz verde — símbolo clássico de Segurança do Trabalho -->
+  <g fill="#26A269">
+    <rect x="224" y="108"  width="64"  height="296" rx="14"/>
+    <rect x="108" y="224"  width="296" height="64"  rx="14"/>
+  </g>
+
+  <!-- Pontos dourados nos cantos para amarrar à identidade Cidade Imperial -->
+  <g fill="#B38335">
+    <circle cx="96"  cy="96"  r="14"/>
+    <circle cx="416" cy="96"  r="14"/>
+    <circle cx="96"  cy="416" r="14"/>
+    <circle cx="416" cy="416" r="14"/>
+  </g>
+</svg>

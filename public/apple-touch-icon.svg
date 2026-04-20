@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Comunicado de Intervenção">
+  <!-- Ícone otimizado para o "Adicionar à Tela de Início" do Safari (180×180) -->
+  <rect width="180" height="180" rx="40" fill="#272525"/>
+  <g fill="#26A269">
+    <rect x="79" y="38"  width="22"  height="104" rx="5"/>
+    <rect x="38" y="79"  width="104" height="22"  rx="5"/>
+  </g>
+  <g fill="#B38335">
+    <circle cx="34"  cy="34"  r="5"/>
+    <circle cx="146" cy="34"  r="5"/>
+    <circle cx="34"  cy="146" r="5"/>
+    <circle cx="146" cy="146" r="5"/>
+  </g>
+</svg>
