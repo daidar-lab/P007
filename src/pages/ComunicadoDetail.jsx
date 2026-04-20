@@ -5,7 +5,10 @@ import Card from '../components/Card.jsx'
 import Badge from '../components/Badge.jsx'
 import { ChevronLeft } from '../components/Icon.jsx'
 import { navigate } from '../lib/router.js'
-import { getComunicado, comunicadoFotoUrl } from '../lib/api.js'
+import { getComunicado, comunicadoFotoUrl, deleteComunicado } from '../lib/api.js'
+import { getUser } from '../lib/auth.js'
+import { hasPermission, PERMISSIONS } from '../lib/rbac.js'
+import '../pages/ClassificacoesCrud.css'
 import './ComunicadoDetail.css'
 
 function formatData(dateValue) {
@@ -51,6 +54,12 @@ export default function ComunicadoDetail({ id }) {
   const [error, setError] = useState('')
   const [viewingFoto, setViewingFoto] = useState(null)
 
+  const me = getUser()
+  const canDelete = hasPermission(me, PERMISSIONS.COMUNICADOS_DELETE)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
   useEffect(() => {
     let cancelled = false
     setStatus('loading')
@@ -69,6 +78,21 @@ export default function ComunicadoDetail({ id }) {
   }, [id])
 
   const back = () => navigate('comunicados')
+
+  const remove = async () => {
+    if (!canDelete || deleting) return
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      await deleteComunicado(id)
+      navigate('comunicados')
+    } catch (err) {
+      setDeleteError(err.message || 'Falha ao excluir comunicado')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
     <div className="screen">
@@ -172,6 +196,38 @@ export default function ComunicadoDetail({ id }) {
               </ul>
             )}
           </Card>
+
+          {canDelete && (
+            <div className="crud-danger">
+              {deleteError && <p className="crud-error">{deleteError}</p>}
+              {!confirmDelete ? (
+                <Button
+                  variant="ghost"
+                  size="md"
+                  onClick={() => { setConfirmDelete(true); setDeleteError('') }}
+                  disabled={deleting}
+                  className="crud-danger__trigger"
+                >
+                  Excluir comunicado
+                </Button>
+              ) : (
+                <Card padding="md" className="stack stack-sm">
+                  <p className="text-body" style={{ margin: 0 }}>
+                    Excluir este comunicado? Esta ação também apaga os itens
+                    marcados e as fotos anexadas. Não pode ser desfeita.
+                  </p>
+                  <div className="crud-actions">
+                    <Button variant="secondary" onClick={() => setConfirmDelete(false)} disabled={deleting}>
+                      Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={remove} disabled={deleting} className="btn--danger">
+                      {deleting ? 'Excluindo…' : 'Sim, excluir'}
+                    </Button>
+                  </div>
+                </Card>
+              )}
+            </div>
+          )}
         </div>
       )}
 

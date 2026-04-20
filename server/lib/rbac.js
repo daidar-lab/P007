@@ -3,6 +3,7 @@
 
 export const PERMISSIONS = {
   COMUNICADOS_CREATE: 'comunicados:create',
+  COMUNICADOS_DELETE: 'comunicados:delete',
   HISTORICO_VIEW:     'historico:view',
   CADASTROS_MANAGE:   'cadastros:manage',
   USUARIOS_MANAGE:    'usuarios:manage',
@@ -13,6 +14,7 @@ export const ROLES = {
     label: 'Administrador',
     perms: [
       PERMISSIONS.COMUNICADOS_CREATE,
+      PERMISSIONS.COMUNICADOS_DELETE,
       PERMISSIONS.HISTORICO_VIEW,
       PERMISSIONS.CADASTROS_MANAGE,
       PERMISSIONS.USUARIOS_MANAGE,

@@ -6,6 +6,7 @@ const router = Router()
 
 const canView   = requirePermission(PERMISSIONS.HISTORICO_VIEW)
 const canCreate = requirePermission(PERMISSIONS.COMUNICADOS_CREATE)
+const canDelete = requirePermission(PERMISSIONS.COMUNICADOS_DELETE)
 
 const MAX_FOTOS = 10
 const MAX_FOTO_BYTES = 8 * 1024 * 1024 // 8 MB por foto
@@ -296,6 +297,23 @@ router.post('/', canCreate, async (req, res) => {
     res.status(500).json({ error: 'Erro ao salvar comunicado' })
   } finally {
     client.release()
+  }
+})
+
+// DELETE /api/comunicados/:id — apenas admin
+// ON DELETE CASCADE em fato_comunicado_item_observado e fato_comunicado_foto
+// remove as dependências automaticamente.
+router.delete('/:id(\\d+)', canDelete, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query(
+      `DELETE FROM fato_comunicado WHERE id = $1`,
+      [req.params.id]
+    )
+    if (rowCount === 0) return res.status(404).json({ error: 'Comunicado não encontrado' })
+    res.status(204).end()
+  } catch (err) {
+    console.error('[comunicados] DELETE falhou:', err)
+    res.status(500).json({ error: 'Erro ao excluir comunicado' })
   }
 })
 

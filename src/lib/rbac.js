@@ -2,6 +2,7 @@
 
 export const PERMISSIONS = {
   COMUNICADOS_CREATE: 'comunicados:create',
+  COMUNICADOS_DELETE: 'comunicados:delete',
   HISTORICO_VIEW:     'historico:view',
   CADASTROS_MANAGE:   'cadastros:manage',
   USUARIOS_MANAGE:    'usuarios:manage',

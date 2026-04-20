@@ -160,6 +160,9 @@ export const getComunicado = (id) =>
 export const comunicadoFotoUrl = (comunicadoId, fotoId) =>
   `${apiBase}/api/comunicados/${comunicadoId}/fotos/${fotoId}`
 
+export const deleteComunicado = (id) =>
+  request(`/api/comunicados/${id}`, { method: 'DELETE' })
+
 // ---------- Usuários ----------
 export const getUsuarios = () => request('/api/usuarios')
 
