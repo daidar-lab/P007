@@ -111,3 +111,7 @@ export const updateItemObservado = (id, data) =>
 
 export const deleteItemObservado = (id) =>
   request(`/api/itens-observados/${id}`, { method: 'DELETE' })
+
+// ---------- Comunicados (fato_comunicado) ----------
+export const createComunicado = (data) =>
+  request('/api/comunicados', { method: 'POST', ...jsonBody(data) })

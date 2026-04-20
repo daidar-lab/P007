@@ -17,6 +17,7 @@ import {
   getAreas,
   getSetores,
   getItensObservados,
+  createComunicado,
 } from '../lib/api.js'
 import './Home.css'
 
@@ -59,6 +60,7 @@ export default function Home() {
   const [form, setForm] = useState(emptyForm)
   const [step, setStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [sent, setSent] = useState(false)
   const [sentCount, setSentCount] = useState(0)
 
@@ -281,26 +283,45 @@ export default function Home() {
     // Evita que Enter em qualquer campo de texto dispare o envio antes da hora.
     if (step !== STEPS.length - 1) return
     if (!canAdvance() || submitting) return
+
     setSubmitting(true)
+    setSubmitError('')
 
-    // Simula envio do comunicado e upload das fotos.
-    // Dados do formulário: ~600ms. Cada foto: +400ms (máx. 5s no total).
-    const photoCount = form.fotos.length
-    const delay = Math.min(600 + photoCount * 400, 5000)
-    await new Promise(resolve => setTimeout(resolve, delay))
+    const isOutrosMarked = !!outrosId && form.observacoes.includes(outrosId)
+    const payload = {
+      classificacao_id:     Number(form.classificacao),
+      filial_id:            Number(form.empresa),
+      area_id:              Number(form.area),
+      setor_id:             Number(form.setor),
+      data_comunicado:      form.data,
+      hora_comunicado:      form.hora,
+      atividade:            form.atividade.trim(),
+      intervencao_por:      form.intervencaoPor.trim(),
+      matricula:            form.matricula.trim(),
+      funcao:               form.funcao.trim(),
+      outros_descricao:     isOutrosMarked ? form.outros.trim() : null,
+      descricao_observado:  form.descricao.trim(),
+      acoes_imediatas:      form.acoes.trim(),
+      alto_risco_potencial: form.altoRisco === 'sim',
+      itens_observados_ids: form.observacoes.map(Number),
+    }
 
-    console.log('Comunicado de Intervenção:', form)
-
-    form.fotos.forEach(p => URL.revokeObjectURL(p.src))
-    setSubmitting(false)
-    setSentCount(photoCount)
-    setSent(true)
-
-    setTimeout(() => {
-      setSent(false)
-      setForm(emptyForm())
-      setStep(0)
-    }, 2800)
+    try {
+      await createComunicado(payload)
+      const photoCount = form.fotos.length
+      form.fotos.forEach(p => URL.revokeObjectURL(p.src))
+      setSubmitting(false)
+      setSentCount(photoCount)
+      setSent(true)
+      setTimeout(() => {
+        setSent(false)
+        setForm(emptyForm())
+        setStep(0)
+      }, 2800)
+    } catch (err) {
+      setSubmitting(false)
+      setSubmitError(err.message || 'Falha ao enviar comunicado')
+    }
   }
 
   const isLast = step === STEPS.length - 1
@@ -524,6 +545,12 @@ export default function Home() {
       {!canAdvance() && (
         <p className="required-hint">
           Preencha todos os campos desta etapa para continuar.
+        </p>
+      )}
+
+      {submitError && (
+        <p className="required-hint" style={{ color: 'var(--color-accent-danger)' }}>
+          {submitError}
         </p>
       )}
 
