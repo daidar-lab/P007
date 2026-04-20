@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from '../components/Header.jsx'
 import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
@@ -11,6 +11,7 @@ import CheckboxGroup from '../components/CheckboxGroup.jsx'
 import Combobox from '../components/Combobox.jsx'
 import PhotoUploader from '../components/PhotoUploader.jsx'
 import { ChevronLeft, ChevronRight } from '../components/Icon.jsx'
+import { getClassificacoes } from '../lib/api.js'
 import './Home.css'
 
 const OBSERVACAO_OPTIONS = [
@@ -85,6 +86,31 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
   const [sentCount, setSentCount] = useState(0)
+
+  // Carrega classificações da API (tabela dim_classificacao)
+  const [classificacoes, setClassificacoes] = useState([])
+  const [classifStatus, setClassifStatus] = useState('loading') // loading | ok | error
+  const [classifError, setClassifError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    setClassifStatus('loading')
+    getClassificacoes()
+      .then(rows => {
+        if (cancelled) return
+        setClassificacoes(rows.map(r => ({
+          value: String(r.id),
+          label: r.descricao,
+        })))
+        setClassifStatus('ok')
+      })
+      .catch(err => {
+        if (cancelled) return
+        setClassifError(err.message || 'Falha ao carregar')
+        setClassifStatus('error')
+      })
+    return () => { cancelled = true }
+  }, [])
 
   const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
   const onInput = (k) => (e) => set(k)(e.target.value)
@@ -198,17 +224,23 @@ export default function Home() {
         {step === 0 && (
           <Card elevated padding="lg" className="stack stack-md">
             <Field label="Classificação" required>
-              <RadioGroup
-                name="classificacao"
-                value={form.classificacao}
-                onChange={set('classificacao')}
-                direction="col"
-                options={[
-                  { value: 'comportamento',  label: 'Comportamento Inseguro' },
-                  { value: 'condicao',       label: 'Condição Insegura' },
-                  { value: 'quase_acidente', label: 'Quase Acidente' },
-                ]}
-              />
+              {classifStatus === 'loading' && (
+                <p className="text-muted">Carregando classificações…</p>
+              )}
+              {classifStatus === 'error' && (
+                <p className="text-muted" style={{ color: 'var(--color-accent-danger)' }}>
+                  Não foi possível carregar: {classifError}
+                </p>
+              )}
+              {classifStatus === 'ok' && (
+                <RadioGroup
+                  name="classificacao"
+                  value={form.classificacao}
+                  onChange={set('classificacao')}
+                  direction="col"
+                  options={classificacoes}
+                />
+              )}
             </Field>
           </Card>
         )}

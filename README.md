@@ -6,10 +6,32 @@ Template React + Vite aplicando um tema mobile **monocromático, em pílulas e c
 
 ```bash
 npm install
-npm run dev       # inicia em http://localhost:5173
-npm run build     # build de produção
+npm run dev       # front em http://localhost:5173 (Vite)
+npm run dev:api   # API em http://localhost:3001 (Express + pg)
+npm run dev:all   # ambos juntos (concurrently)
+npm run build     # build de produção do front
 npm run preview   # serve o build
 ```
+
+### Variáveis de ambiente
+
+Copie o `.env.example` para `.env` e preencha:
+
+```
+DATABASE_URL=postgres://usuario:senha@host:5432/banco
+PORT=3001
+VITE_API_BASE=        # vazio em dev (Vite proxia /api → 3001)
+```
+
+### Endpoints da API
+
+| Método | Caminho                  | Origem                                      |
+|:------:|--------------------------|---------------------------------------------|
+| GET    | `/api/health`            | health-check                                |
+| GET    | `/api/classificacoes`    | `dim_classificacao` (linhas com `ativo=true`)|
+
+A tela "Comunicado de Intervenção" carrega o radio group de Classificação
+(Etapa 1) a partir do endpoint `/api/classificacoes` — sem hardcode.
 
 ## Estrutura
 
