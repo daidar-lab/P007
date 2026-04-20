@@ -21,7 +21,7 @@ const ENTIDADES = [
     key: 'areas',
     title: 'Áreas',
     subtitle: 'Áreas organizacionais por filial',
-    available: false,
+    available: true,
   },
   {
     key: 'setores',
@@ -33,7 +33,7 @@ const ENTIDADES = [
     key: 'itens-observados',
     title: 'Itens observados',
     subtitle: 'Checklist da Etapa 4 do comunicado',
-    available: false,
+    available: true,
   },
 ]
 

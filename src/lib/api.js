@@ -52,3 +52,40 @@ export const updateFilial = (id, data) =>
 
 export const deleteFilial = (id) =>
   request(`/api/filiais/${id}`, { method: 'DELETE' })
+
+// ---------- Áreas ----------
+export const getAreas = ({ onlyActive = false, filialId } = {}) => {
+  const qs = []
+  if (onlyActive) qs.push('ativos=true')
+  if (filialId)   qs.push(`filial_id=${filialId}`)
+  const suffix = qs.length ? `?${qs.join('&')}` : ''
+  return request(`/api/areas${suffix}`)
+}
+
+export const getArea = (id) =>
+  request(`/api/areas/${id}`)
+
+export const createArea = (data) =>
+  request('/api/areas', { method: 'POST', ...jsonBody(data) })
+
+export const updateArea = (id, data) =>
+  request(`/api/areas/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const deleteArea = (id) =>
+  request(`/api/areas/${id}`, { method: 'DELETE' })
+
+// ---------- Itens observados ----------
+export const getItensObservados = (onlyActive = false) =>
+  request(`/api/itens-observados${onlyActive ? '?ativos=true' : ''}`)
+
+export const getItemObservado = (id) =>
+  request(`/api/itens-observados/${id}`)
+
+export const createItemObservado = (data) =>
+  request('/api/itens-observados', { method: 'POST', ...jsonBody(data) })
+
+export const updateItemObservado = (id, data) =>
+  request(`/api/itens-observados/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const deleteItemObservado = (id) =>
+  request(`/api/itens-observados/${id}`, { method: 'DELETE' })
