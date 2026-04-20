@@ -116,8 +116,16 @@ export const deleteItemObservado = (id) =>
 export const createComunicado = (data) =>
   request('/api/comunicados', { method: 'POST', ...jsonBody(data) })
 
-export const getComunicados = () =>
-  request('/api/comunicados')
+export const getComunicados = (filters = {}) => {
+  const qs = []
+  if (filters.filial_id)        qs.push(`filial_id=${filters.filial_id}`)
+  if (filters.area_id)          qs.push(`area_id=${filters.area_id}`)
+  if (filters.classificacao_id) qs.push(`classificacao_id=${filters.classificacao_id}`)
+  if (filters.alto_risco === 'sim') qs.push('alto_risco=true')
+  if (filters.alto_risco === 'nao') qs.push('alto_risco=false')
+  const suffix = qs.length ? `?${qs.join('&')}` : ''
+  return request(`/api/comunicados${suffix}`)
+}
 
 export const getComunicado = (id) =>
   request(`/api/comunicados/${id}`)

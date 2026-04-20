@@ -98,7 +98,26 @@ function validatePayload(body) {
 }
 
 // GET /api/comunicados — lista (sem blobs das fotos)
-router.get('/', async (_req, res) => {
+// Filtros (query string): filial_id, area_id, classificacao_id, alto_risco=true|false
+router.get('/', async (req, res) => {
+  const params = []
+  const conds  = []
+  if (req.query.filial_id) {
+    params.push(Number(req.query.filial_id))
+    conds.push(`c.filial_id = $${params.length}`)
+  }
+  if (req.query.area_id) {
+    params.push(Number(req.query.area_id))
+    conds.push(`c.area_id = $${params.length}`)
+  }
+  if (req.query.classificacao_id) {
+    params.push(Number(req.query.classificacao_id))
+    conds.push(`c.classificacao_id = $${params.length}`)
+  }
+  if (req.query.alto_risco === 'true')  conds.push(`c.alto_risco_potencial = TRUE`)
+  if (req.query.alto_risco === 'false') conds.push(`c.alto_risco_potencial = FALSE`)
+  const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''
+
   try {
     const { rows } = await pool.query(
       `SELECT c.id,
@@ -118,7 +137,9 @@ router.get('/', async (_req, res) => {
          JOIN dim_filial        f  ON f.id  = c.filial_id
          JOIN dim_area          a  ON a.id  = c.area_id
          JOIN dim_setor         s  ON s.id  = c.setor_id
-        ORDER BY c.criado_em DESC`
+         ${where}
+        ORDER BY c.criado_em DESC`,
+      params
     )
     res.json(rows)
   } catch (err) {
