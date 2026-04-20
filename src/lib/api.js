@@ -1,7 +1,22 @@
+import { getToken, clearSession } from './auth.js'
+
 const apiBase = import.meta.env.VITE_API_BASE || ''
 
-async function request(path, init) {
-  const res = await fetch(`${apiBase}${path}`, init)
+async function request(path, init = {}) {
+  const headers = { ...(init.headers || {}) }
+  const token = getToken()
+  if (token) headers['Authorization'] = `Bearer ${token}`
+
+  const res = await fetch(`${apiBase}${path}`, { ...init, headers })
+
+  if (res.status === 401) {
+    // Token ausente, expirado ou inválido — limpa sessão e avisa a app
+    clearSession()
+    const err = new Error('Sessão expirada. Faça login novamente.')
+    err.status = 401
+    throw err
+  }
+
   if (!res.ok) {
     let message = res.statusText
     try {
@@ -20,6 +35,12 @@ const jsonBody = (body) => ({
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(body),
 })
+
+// ---------- Autenticação ----------
+export const login = (usuario, senha) =>
+  request('/api/auth/login', { method: 'POST', ...jsonBody({ usuario, senha }) })
+
+export const getMe = () => request('/api/auth/me')
 
 // ---------- Classificações ----------
 export const getClassificacoes = (onlyActive = false) =>

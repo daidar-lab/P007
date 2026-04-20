@@ -1,6 +1,10 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import bcrypt from 'bcryptjs'
+import { pool } from './db.js'
+import { requireAuth } from './middleware/auth.js'
+import authRouter             from './routes/auth.js'
 import classificacoesRouter   from './routes/classificacoes.js'
 import filiaisRouter          from './routes/filiais.js'
 import areasRouter            from './routes/areas.js'
@@ -15,7 +19,12 @@ app.use(cors())
 // Limite alto para acomodar uploads de fotos em base64 no payload
 app.use(express.json({ limit: '30mb' }))
 
+// --- Rotas públicas ---
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
+app.use('/api/auth', authRouter)
+
+// --- Tudo abaixo exige autenticação ---
+app.use('/api', requireAuth)
 
 app.use('/api/classificacoes',    classificacoesRouter)
 app.use('/api/filiais',           filiaisRouter)
@@ -24,6 +33,24 @@ app.use('/api/setores',           setoresRouter)
 app.use('/api/itens-observados',  itensObservadosRouter)
 app.use('/api/comunicados',       comunicadosRouter)
 
-app.listen(port, () => {
+async function ensureAdminUser() {
+  try {
+    const { rows } = await pool.query(`SELECT COUNT(*)::int AS c FROM dim_usuario`)
+    if (rows[0].c === 0) {
+      const hash = await bcrypt.hash('admin', 10)
+      await pool.query(
+        `INSERT INTO dim_usuario (usuario, senha_hash, nome, ativo)
+              VALUES ($1, $2, $3, TRUE)`,
+        ['admin', hash, 'Administrador']
+      )
+      console.log('[auth] usuário padrão criado: admin/admin — TROQUE A SENHA')
+    }
+  } catch (err) {
+    console.error('[auth] bootstrap do admin falhou:', err.message)
+  }
+}
+
+app.listen(port, async () => {
   console.log(`[api] ouvindo em http://localhost:${port}`)
+  await ensureAdminUser()
 })

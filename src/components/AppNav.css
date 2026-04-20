@@ -1,3 +1,44 @@
+.app-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-2);
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-inset);
+}
+.app-user__info { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+.app-user__name {
+  font-size: var(--fs-13);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-user__login {
+  font-size: var(--fs-11);
+  color: var(--color-text-tertiary);
+}
+.app-user__logout {
+  height: 32px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+.app-user__logout:hover {
+  background: var(--color-accent-danger);
+  color: #fff;
+}
+
 .app-nav {
   position: sticky;
   top: 0;
