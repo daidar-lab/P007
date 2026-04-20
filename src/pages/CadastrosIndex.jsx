@@ -27,7 +27,7 @@ const ENTIDADES = [
     key: 'setores',
     title: 'Setores',
     subtitle: 'Subdivisão das áreas',
-    available: false,
+    available: true,
   },
   {
     key: 'itens-observados',

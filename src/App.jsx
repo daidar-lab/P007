@@ -4,6 +4,7 @@ import CadastrosIndex from './pages/CadastrosIndex.jsx'
 import ClassificacoesCrud from './pages/ClassificacoesCrud.jsx'
 import FiliaisCrud from './pages/FiliaisCrud.jsx'
 import AreasCrud from './pages/AreasCrud.jsx'
+import SetoresCrud from './pages/SetoresCrud.jsx'
 import ItensObservadosCrud from './pages/ItensObservadosCrud.jsx'
 import { useHashRoute } from './lib/router.js'
 
@@ -16,6 +17,7 @@ export default function App() {
   else if (route === 'cadastros/classificacoes')         page = <ClassificacoesCrud />
   else if (route === 'cadastros/filiais')                page = <FiliaisCrud />
   else if (route === 'cadastros/areas')                  page = <AreasCrud />
+  else if (route === 'cadastros/setores')                page = <SetoresCrud />
   else if (route === 'cadastros/itens-observados')       page = <ItensObservadosCrud />
   else                                                   page = <NotFound />
 

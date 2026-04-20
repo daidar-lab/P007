@@ -74,6 +74,28 @@ export const updateArea = (id, data) =>
 export const deleteArea = (id) =>
   request(`/api/areas/${id}`, { method: 'DELETE' })
 
+// ---------- Setores ----------
+export const getSetores = ({ onlyActive = false, areaId, filialId } = {}) => {
+  const qs = []
+  if (onlyActive) qs.push('ativos=true')
+  if (areaId)     qs.push(`area_id=${areaId}`)
+  if (filialId)   qs.push(`filial_id=${filialId}`)
+  const suffix = qs.length ? `?${qs.join('&')}` : ''
+  return request(`/api/setores${suffix}`)
+}
+
+export const getSetor = (id) =>
+  request(`/api/setores/${id}`)
+
+export const createSetor = (data) =>
+  request('/api/setores', { method: 'POST', ...jsonBody(data) })
+
+export const updateSetor = (id, data) =>
+  request(`/api/setores/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const deleteSetor = (id) =>
+  request(`/api/setores/${id}`, { method: 'DELETE' })
+
 // ---------- Itens observados ----------
 export const getItensObservados = (onlyActive = false) =>
   request(`/api/itens-observados${onlyActive ? '?ativos=true' : ''}`)
