@@ -12,7 +12,7 @@
   transition: box-shadow var(--dur-base) var(--ease-standard);
 }
 .textfield::placeholder { color: var(--color-text-tertiary); }
-.textfield:focus { box-shadow: 0 0 0 2px var(--color-invert); }
+.textfield:focus { box-shadow: 0 0 0 2px var(--color-accent); }
 .textfield:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .textarea {
@@ -31,4 +31,4 @@
   transition: box-shadow var(--dur-base) var(--ease-standard);
 }
 .textarea::placeholder { color: var(--color-text-tertiary); }
-.textarea:focus { box-shadow: 0 0 0 2px var(--color-invert); }
+.textarea:focus { box-shadow: 0 0 0 2px var(--color-accent); }

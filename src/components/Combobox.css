@@ -19,7 +19,7 @@
   transition: box-shadow var(--dur-base) var(--ease-standard);
 }
 .combobox.is-open .combobox__trigger {
-  box-shadow: 0 0 0 2px var(--color-invert);
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 .combobox__value {
   flex: 1;

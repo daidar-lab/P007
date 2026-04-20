@@ -8,15 +8,15 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-pill);
-  background: var(--color-invert);
-  color: var(--color-text-on-invert);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: var(--fw-bold);
   font-size: var(--fs-15);
   letter-spacing: 0.04em;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 .brand__name {
   margin: 0;

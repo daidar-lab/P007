@@ -5,28 +5,35 @@
 
 :root {
   /* ---------- Cor / Superfície ---------- */
-  --color-bg: #F5F5F3;           /* base off-white */
+  --color-bg: #F5F2EC;           /* off-white levemente quente, harmoniza com o dourado */
   --color-surface: #FFFFFF;      /* cartões */
-  --color-surface-muted: #EEEEEC;/* superfícies secundárias */
+  --color-surface-muted: #ECE8DF;/* superfícies secundárias */
   --color-elevated: #FFFFFF;     /* elementos flutuantes */
 
   /* ---------- Cor / Texto ---------- */
-  --color-text: #111111;         /* título / ênfase */
-  --color-text-secondary: #5B5B5B;
-  --color-text-tertiary: #8A8A8A;
+  --color-text: #272525;         /* preto da marca */
+  --color-text-secondary: #5B5754;
+  --color-text-tertiary: #8A8581;
   --color-text-on-invert: #FFFFFF;
+  --color-text-on-accent: #FFFFFF;
 
   /* ---------- Cor / Linha ---------- */
-  --color-border: rgba(17, 17, 17, 0.08);
-  --color-border-strong: rgba(17, 17, 17, 0.16);
-  --color-divider: rgba(17, 17, 17, 0.06);
+  --color-border: rgba(39, 37, 37, 0.08);
+  --color-border-strong: rgba(39, 37, 37, 0.16);
+  --color-divider: rgba(39, 37, 37, 0.06);
 
   /* ---------- Cor / Ação ---------- */
-  --color-invert: #111111;       /* botão primário */
-  --color-invert-hover: #2A2A2A;
-  --color-invert-press: #000000;
+  --color-invert: #272525;       /* PRETO da marca — botão primário */
+  --color-invert-hover: #3A3636;
+  --color-invert-press: #1A1818;
 
-  /* Accents sutis (opcionais, para estados) */
+  /* ---------- Cor / Marca (DOURADO) ---------- */
+  --color-accent: #B38335;       /* PMS 871C — DOURADO */
+  --color-accent-hover: #9C7129;
+  --color-accent-press: #876123;
+  --color-accent-soft: rgba(179, 131, 53, 0.12);
+
+  /* Accents sutis para estados (mantidos) */
   --color-accent-success: #2E7D5B;
   --color-accent-warning: #B07A0C;
   --color-accent-danger:  #B42318;
@@ -109,20 +116,25 @@
 /* ---------- Dark mode opcional (prévia) ---------- */
 @media (prefers-color-scheme: dark) {
   :root[data-theme="auto"] {
-    --color-bg: #0E0E0E;
-    --color-surface: #181818;
-    --color-surface-muted: #1F1F1F;
-    --color-elevated: #1C1C1C;
-    --color-text: #F5F5F3;
-    --color-text-secondary: #B5B5B5;
-    --color-text-tertiary: #8A8A8A;
-    --color-text-on-invert: #111111;
-    --color-border: rgba(245, 245, 243, 0.10);
-    --color-border-strong: rgba(245, 245, 243, 0.18);
-    --color-divider: rgba(245, 245, 243, 0.06);
-    --color-invert: #F5F5F3;
-    --color-invert-hover: #E5E5E3;
+    --color-bg: #161413;
+    --color-surface: #1E1B1A;
+    --color-surface-muted: #262321;
+    --color-elevated: #221F1E;
+    --color-text: #F5F2EC;
+    --color-text-secondary: #B5B0A8;
+    --color-text-tertiary: #8A857F;
+    --color-text-on-invert: #272525;
+    --color-text-on-accent: #FFFFFF;
+    --color-border: rgba(245, 242, 236, 0.10);
+    --color-border-strong: rgba(245, 242, 236, 0.18);
+    --color-divider: rgba(245, 242, 236, 0.06);
+    --color-invert: #F5F2EC;
+    --color-invert-hover: #E5E1DA;
     --color-invert-press: #FFFFFF;
+    --color-accent: #D4A24F;       /* dourado mais claro pra contraste */
+    --color-accent-hover: #E5B25C;
+    --color-accent-press: #C99847;
+    --color-accent-soft: rgba(212, 162, 79, 0.16);
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.45);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);

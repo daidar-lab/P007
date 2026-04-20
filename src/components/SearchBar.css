@@ -10,7 +10,7 @@
   transition: box-shadow var(--dur-base) var(--ease-standard);
 }
 .searchbar:focus-within {
-  box-shadow: 0 0 0 2px var(--color-invert);
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 .searchbar__icon { color: var(--color-text-tertiary); flex-shrink: 0; }
 .searchbar__input {

@@ -96,9 +96,9 @@ a { color: inherit; text-decoration: none; }
 .row-gap-3 { gap: var(--space-3); }
 .row-gap-4 { gap: var(--space-4); }
 
-/* Focus visível, acessível e discreto */
+/* Focus visível, acessível e discreto — dourado da marca */
 :focus-visible {
-  outline: 2px solid var(--color-invert);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }

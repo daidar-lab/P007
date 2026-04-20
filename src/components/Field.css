@@ -9,7 +9,7 @@
   color: var(--color-text);
   letter-spacing: var(--ls-normal);
 }
-.field__required { color: var(--color-accent-danger); }
+.field__required { color: var(--color-accent); }
 .field__hint {
   font-size: var(--fs-12);
   color: var(--color-text-tertiary);
