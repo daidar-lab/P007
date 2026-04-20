@@ -18,7 +18,8 @@
   border: 0;
   outline: 0;
   background: transparent;
-  font-size: var(--fs-15);
+  /* 16px previne zoom automático do iOS ao focar o campo */
+  font-size: 16px;
   color: var(--color-text);
 }
 .searchbar__input::placeholder { color: var(--color-text-tertiary); }

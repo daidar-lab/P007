@@ -6,7 +6,8 @@
   outline: 0;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: var(--fs-15);
+  /* 16px evita o auto-zoom do iOS Safari ao focar o input */
+  font-size: 16px;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-inset);
   transition: box-shadow var(--dur-base) var(--ease-standard);
@@ -24,7 +25,8 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: var(--fs-15);
+  /* 16px evita o auto-zoom do iOS Safari ao focar o textarea */
+  font-size: 16px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-inset);
   resize: vertical;
