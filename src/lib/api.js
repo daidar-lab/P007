@@ -36,3 +36,19 @@ export const updateClassificacao = (id, data) =>
 
 export const deleteClassificacao = (id) =>
   request(`/api/classificacoes/${id}`, { method: 'DELETE' })
+
+// ---------- Filiais ----------
+export const getFiliais = (onlyActive = false) =>
+  request(`/api/filiais${onlyActive ? '?ativos=true' : ''}`)
+
+export const getFilial = (id) =>
+  request(`/api/filiais/${id}`)
+
+export const createFilial = (data) =>
+  request('/api/filiais', { method: 'POST', ...jsonBody(data) })
+
+export const updateFilial = (id, data) =>
+  request(`/api/filiais/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const deleteFilial = (id) =>
+  request(`/api/filiais/${id}`, { method: 'DELETE' })

@@ -15,7 +15,7 @@ const ENTIDADES = [
     key: 'filiais',
     title: 'Filiais',
     subtitle: 'Frutal, Petrópolis e outras unidades',
-    available: false,
+    available: true,
   },
   {
     key: 'areas',
