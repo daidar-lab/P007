@@ -62,6 +62,9 @@ export default function Home() {
   const [sent, setSent] = useState(false)
   const [sentCount, setSentCount] = useState(0)
 
+  const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
+  const onInput = (k) => (e) => set(k)(e.target.value)
+
   // Carrega classificações da API (tabela dim_classificacao)
   const [classificacoes, setClassificacoes] = useState([])
   const [classifStatus, setClassifStatus] = useState('loading') // loading | ok | error
@@ -213,9 +216,6 @@ export default function Home() {
   const onSetorChange = (v) => {
     setForm(f => ({ ...f, setor: v }))
   }
-
-  const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
-  const onInput = (k) => (e) => set(k)(e.target.value)
 
   const { date: todayStr, time: nowTimeStr } = nowParts()
 
