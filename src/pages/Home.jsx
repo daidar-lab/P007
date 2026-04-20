@@ -277,9 +277,20 @@ export default function Home() {
   const goBack = () => setStep(s => Math.max(0, s - 1))
   const goNext = () => setStep(s => Math.min(STEPS.length - 1, s + 1))
 
+  const fileToBase64 = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = String(reader.result || '')
+      const comma  = result.indexOf(',')
+      resolve(comma >= 0 ? result.slice(comma + 1) : result)
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+
   const submit = async (e) => {
     e.preventDefault()
-    // Só envia quando o usuário está na última etapa (Fotos).
+    // Só envia quando o usuário está na última etapa (Fotos & envio).
     // Evita que Enter em qualquer campo de texto dispare o envio antes da hora.
     if (step !== STEPS.length - 1) return
     if (!canAdvance() || submitting) return
@@ -287,27 +298,38 @@ export default function Home() {
     setSubmitting(true)
     setSubmitError('')
 
-    const isOutrosMarked = !!outrosId && form.observacoes.includes(outrosId)
-    const payload = {
-      classificacao_id:     Number(form.classificacao),
-      filial_id:            Number(form.empresa),
-      area_id:              Number(form.area),
-      setor_id:             Number(form.setor),
-      data_comunicado:      form.data,
-      hora_comunicado:      form.hora,
-      atividade:            form.atividade.trim(),
-      intervencao_por:      form.intervencaoPor.trim(),
-      matricula:            form.matricula.trim(),
-      funcao:               form.funcao.trim(),
-      outros_descricao:     isOutrosMarked ? form.outros.trim() : null,
-      descricao_observado:  form.descricao.trim(),
-      acoes_imediatas:      form.acoes.trim(),
-      alto_risco_potencial: form.altoRisco === 'sim',
-      itens_observados_ids: form.observacoes.map(Number),
-    }
-
     try {
+      // Serializa as fotos (base64) — só roda nesta etapa, nunca antes
+      const fotos = await Promise.all(
+        form.fotos.map(async p => ({
+          nome: p.name,
+          mime: p.file.type || 'application/octet-stream',
+          base64: await fileToBase64(p.file),
+        }))
+      )
+
+      const isOutrosMarked = !!outrosId && form.observacoes.includes(outrosId)
+      const payload = {
+        classificacao_id:     Number(form.classificacao),
+        filial_id:            Number(form.empresa),
+        area_id:              Number(form.area),
+        setor_id:             Number(form.setor),
+        data_comunicado:      form.data,
+        hora_comunicado:      form.hora,
+        atividade:            form.atividade.trim(),
+        intervencao_por:      form.intervencaoPor.trim(),
+        matricula:            form.matricula.trim(),
+        funcao:               form.funcao.trim(),
+        outros_descricao:     isOutrosMarked ? form.outros.trim() : null,
+        descricao_observado:  form.descricao.trim(),
+        acoes_imediatas:      form.acoes.trim(),
+        alto_risco_potencial: form.altoRisco === 'sim',
+        itens_observados_ids: form.observacoes.map(Number),
+        fotos,
+      }
+
       await createComunicado(payload)
+
       const photoCount = form.fotos.length
       form.fotos.forEach(p => URL.revokeObjectURL(p.src))
       setSubmitting(false)

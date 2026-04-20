@@ -3,6 +3,10 @@ import { pool } from '../db.js'
 
 const router = Router()
 
+const MAX_FOTOS = 10
+const MAX_FOTO_BYTES = 8 * 1024 * 1024 // 8 MB por foto
+const MIME_PERMITIDO = /^image\//
+
 function validatePayload(body) {
   const errors = []
   const num = (v, field) => {
@@ -35,6 +39,39 @@ function validatePayload(body) {
     : []
   if (itens.length === 0) errors.push('itens_observados_ids deve ter ao menos um item')
 
+  // Fotos: payload no formato [{ nome, mime, base64 }, ...]
+  const fotos = []
+  const rawFotos = Array.isArray(body?.fotos) ? body.fotos : []
+  if (rawFotos.length > MAX_FOTOS) {
+    errors.push(`limite de ${MAX_FOTOS} fotos por comunicado`)
+  } else {
+    for (const [i, f] of rawFotos.entries()) {
+      const nome = typeof f?.nome === 'string' ? f.nome.slice(0, 255) : `foto_${i + 1}`
+      const mime = typeof f?.mime === 'string' ? f.mime : ''
+      const b64  = typeof f?.base64 === 'string' ? f.base64 : ''
+      if (!MIME_PERMITIDO.test(mime)) {
+        errors.push(`foto ${i + 1}: tipo inválido (${mime})`)
+        continue
+      }
+      if (!b64) {
+        errors.push(`foto ${i + 1}: conteúdo ausente`)
+        continue
+      }
+      let buf
+      try { buf = Buffer.from(b64, 'base64') }
+      catch { errors.push(`foto ${i + 1}: base64 inválido`); continue }
+      if (buf.length === 0) {
+        errors.push(`foto ${i + 1}: conteúdo vazio`)
+        continue
+      }
+      if (buf.length > MAX_FOTO_BYTES) {
+        errors.push(`foto ${i + 1}: excede ${(MAX_FOTO_BYTES / 1024 / 1024).toFixed(0)} MB`)
+        continue
+      }
+      fotos.push({ nome, mime, bytes: buf.length, buffer: buf })
+    }
+  }
+
   const data = {
     classificacao_id:     num(body?.classificacao_id, 'classificacao_id'),
     filial_id:            num(body?.filial_id, 'filial_id'),
@@ -53,6 +90,7 @@ function validatePayload(body) {
       : null,
     alto_risco_potencial: body?.alto_risco_potencial === true || body?.alto_risco_potencial === 'true',
     itens_observados_ids: itens,
+    fotos,
   }
 
   if (errors.length) return { error: errors.join('; ') }
@@ -92,7 +130,7 @@ router.post('/', async (req, res) => {
       ]
     )
 
-    // Tabela-ponte: uma linha por item observado selecionado
+    // Ponte N:N — itens observados
     if (d.itens_observados_ids.length > 0) {
       const values = d.itens_observados_ids
         .map((_, i) => `($1, $${i + 2})`)
@@ -104,8 +142,22 @@ router.post('/', async (req, res) => {
       )
     }
 
+    // Fotos — BYTEA na mesma transação
+    for (const f of d.fotos) {
+      await client.query(
+        `INSERT INTO fato_comunicado_foto
+           (comunicado_id, nome_original, mime, tamanho_bytes, conteudo)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [created.id, f.nome, f.mime, f.bytes, f.buffer]
+      )
+    }
+
     await client.query('COMMIT')
-    res.status(201).json({ id: created.id, criado_em: created.criado_em })
+    res.status(201).json({
+      id: created.id,
+      criado_em: created.criado_em,
+      fotos_salvas: d.fotos.length,
+    })
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {})
     if (err.code === '23503') {
