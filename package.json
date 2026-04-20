@@ -8,6 +8,7 @@
     "dev:api": "node --watch server/index.js",
     "dev:all": "concurrently -n web,api -c yellow,cyan \"npm:dev\" \"npm:dev:api\"",
     "start:api": "node server/index.js",
+    "reset-password": "node server/scripts/reset-password.js",
     "build": "vite build",
     "preview": "vite preview"
   },
