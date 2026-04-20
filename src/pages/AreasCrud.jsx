@@ -289,7 +289,7 @@ export default function AreasCrud() {
       {status === 'ok' && list.length > 0 && (
         <div className="stack stack-lg">
           {groupedByFilial.map(g => (
-            <details key={g.filial_id} className="group-filial" open>
+            <details key={g.filial_id} className="group-filial">
               <summary className="group-filial__title">
                 <span className="group-title__label">{g.filial_descricao}</span>
                 <span className="group-count">{g.items.length}</span>

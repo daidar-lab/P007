@@ -339,7 +339,7 @@ export default function SetoresCrud() {
           {groupedByFilialAndArea.map(fg => {
             const totalSetores = fg.areas.reduce((sum, a) => sum + a.items.length, 0)
             return (
-              <details key={fg.filial_id} className="group-filial" open>
+              <details key={fg.filial_id} className="group-filial">
                 <summary className="group-filial__title">
                   <span className="group-title__label">{fg.filial_descricao}</span>
                   <span className="group-count">{totalSetores}</span>
@@ -347,7 +347,7 @@ export default function SetoresCrud() {
                 </summary>
                 <div className="group-filial__body stack stack-md">
                   {fg.areas.map(ag => (
-                    <details key={ag.area_id} className="group-area" open>
+                    <details key={ag.area_id} className="group-area">
                       <summary className="group-area__title">
                         <span className="group-title__label">{ag.area_descricao}</span>
                         <span className="group-count">{ag.items.length}</span>
