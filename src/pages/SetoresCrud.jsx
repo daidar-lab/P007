@@ -9,7 +9,7 @@ import Field from '../components/Field.jsx'
 import TextField from '../components/TextField.jsx'
 import Combobox from '../components/Combobox.jsx'
 import Switch from '../components/Switch.jsx'
-import { ChevronLeft, Plus } from '../components/Icon.jsx'
+import { ChevronLeft, ChevronDown, Plus } from '../components/Icon.jsx'
 import { navigate } from '../lib/router.js'
 import {
   getSetores,
@@ -336,31 +336,46 @@ export default function SetoresCrud() {
 
       {status === 'ok' && list.length > 0 && (
         <div className="stack stack-lg">
-          {groupedByFilialAndArea.map(fg => (
-            <section key={fg.filial_id} className="group-filial">
-              <h3 className="group-filial__title">{fg.filial_descricao}</h3>
-              {fg.areas.map(ag => (
-                <section key={ag.area_id} className="group-area">
-                  <h4 className="group-area__title">{ag.area_descricao}</h4>
-                  <List>
-                    {ag.items.map(item => (
-                      <ListItem
-                        key={item.id}
-                        title={item.descricao}
-                        trailing={
-                          <Badge variant={item.ativo ? 'solid' : 'soft'}>
-                            {item.ativo ? 'Ativo' : 'Inativo'}
-                          </Badge>
-                        }
-                        showChevron
-                        onClick={() => startEdit(item)}
-                      />
-                    ))}
-                  </List>
-                </section>
-              ))}
-            </section>
-          ))}
+          {groupedByFilialAndArea.map(fg => {
+            const totalSetores = fg.areas.reduce((sum, a) => sum + a.items.length, 0)
+            return (
+              <details key={fg.filial_id} className="group-filial" open>
+                <summary className="group-filial__title">
+                  <span className="group-title__label">{fg.filial_descricao}</span>
+                  <span className="group-count">{totalSetores}</span>
+                  <ChevronDown className="group-chevron" width={18} height={18} />
+                </summary>
+                <div className="group-filial__body stack stack-md">
+                  {fg.areas.map(ag => (
+                    <details key={ag.area_id} className="group-area" open>
+                      <summary className="group-area__title">
+                        <span className="group-title__label">{ag.area_descricao}</span>
+                        <span className="group-count">{ag.items.length}</span>
+                        <ChevronDown className="group-chevron" width={16} height={16} />
+                      </summary>
+                      <div className="group-area__body">
+                        <List>
+                          {ag.items.map(item => (
+                            <ListItem
+                              key={item.id}
+                              title={item.descricao}
+                              trailing={
+                                <Badge variant={item.ativo ? 'solid' : 'soft'}>
+                                  {item.ativo ? 'Ativo' : 'Inativo'}
+                                </Badge>
+                              }
+                              showChevron
+                              onClick={() => startEdit(item)}
+                            />
+                          ))}
+                        </List>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </details>
+            )
+          })}
         </div>
       )}
     </div>

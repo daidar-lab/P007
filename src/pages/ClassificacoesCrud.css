@@ -33,36 +33,73 @@
 }
 .btn--danger:hover { background: #962219; }
 
-/* ------- Agrupamento em listas (filial / área) ------- */
-.group-filial {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+/* ------- Agrupamento colapsável (filial / área) ------- */
+.group-filial + .group-filial { margin-top: var(--space-4); }
+.group-area   + .group-area   { margin-top: var(--space-3); }
+
+.group-filial[open] > .group-filial__body,
+.group-area[open]   > .group-area__body {
+  margin-top: var(--space-2);
 }
-.group-filial + .group-filial { margin-top: var(--space-5); }
+
+/* Hide native disclosure triangles */
+.group-filial > summary::-webkit-details-marker,
+.group-area   > summary::-webkit-details-marker { display: none; }
+.group-filial > summary,
+.group-area   > summary { list-style: none; }
+
+.group-filial__title,
+.group-area__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  margin: 0;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.group-filial__title:hover,
+.group-area__title:hover { background: var(--color-surface-muted); }
 
 .group-filial__title {
-  margin: 0;
-  padding: 0 var(--space-2);
   font-size: var(--fs-17);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-tight);
   color: var(--color-text);
 }
 
-.group-area {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.group-area + .group-area { margin-top: var(--space-3); }
-
 .group-area__title {
-  margin: 0;
-  padding: 0 var(--space-2);
   font-size: var(--fs-12);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
   color: var(--color-text-tertiary);
+}
+
+.group-title__label { flex: 1; min-width: 0; }
+
+.group-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-11);
+  font-weight: var(--fw-semibold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.group-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+.group-filial[open] > summary .group-chevron,
+.group-area[open]   > summary .group-chevron {
+  transform: rotate(180deg);
 }

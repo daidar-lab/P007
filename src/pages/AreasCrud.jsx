@@ -9,7 +9,7 @@ import Field from '../components/Field.jsx'
 import TextField from '../components/TextField.jsx'
 import Combobox from '../components/Combobox.jsx'
 import Switch from '../components/Switch.jsx'
-import { ChevronLeft, Plus } from '../components/Icon.jsx'
+import { ChevronLeft, ChevronDown, Plus } from '../components/Icon.jsx'
 import { navigate } from '../lib/router.js'
 import {
   getAreas,
@@ -289,24 +289,30 @@ export default function AreasCrud() {
       {status === 'ok' && list.length > 0 && (
         <div className="stack stack-lg">
           {groupedByFilial.map(g => (
-            <section key={g.filial_id} className="group-filial">
-              <h3 className="group-filial__title">{g.filial_descricao}</h3>
-              <List>
-                {g.items.map(item => (
-                  <ListItem
-                    key={item.id}
-                    title={item.descricao}
-                    trailing={
-                      <Badge variant={item.ativo ? 'solid' : 'soft'}>
-                        {item.ativo ? 'Ativa' : 'Inativa'}
-                      </Badge>
-                    }
-                    showChevron
-                    onClick={() => startEdit(item)}
-                  />
-                ))}
-              </List>
-            </section>
+            <details key={g.filial_id} className="group-filial" open>
+              <summary className="group-filial__title">
+                <span className="group-title__label">{g.filial_descricao}</span>
+                <span className="group-count">{g.items.length}</span>
+                <ChevronDown className="group-chevron" width={18} height={18} />
+              </summary>
+              <div className="group-filial__body">
+                <List>
+                  {g.items.map(item => (
+                    <ListItem
+                      key={item.id}
+                      title={item.descricao}
+                      trailing={
+                        <Badge variant={item.ativo ? 'solid' : 'soft'}>
+                          {item.ativo ? 'Ativa' : 'Inativa'}
+                        </Badge>
+                      }
+                      showChevron
+                      onClick={() => startEdit(item)}
+                    />
+                  ))}
+                </List>
+              </div>
+            </details>
           ))}
         </div>
       )}
