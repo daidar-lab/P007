@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import ExcelJS from 'exceljs'
 import { pool } from '../db.js'
 import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 
@@ -7,6 +8,28 @@ const router = Router()
 const canView   = requirePermission(PERMISSIONS.HISTORICO_VIEW)
 const canCreate = requirePermission(PERMISSIONS.COMUNICADOS_CREATE)
 const canDelete = requirePermission(PERMISSIONS.COMUNICADOS_DELETE)
+
+// Monta WHERE comum para list + export
+function buildFilters(query) {
+  const params = []
+  const conds = []
+  if (query.filial_id) {
+    params.push(Number(query.filial_id))
+    conds.push(`c.filial_id = $${params.length}`)
+  }
+  if (query.area_id) {
+    params.push(Number(query.area_id))
+    conds.push(`c.area_id = $${params.length}`)
+  }
+  if (query.classificacao_id) {
+    params.push(Number(query.classificacao_id))
+    conds.push(`c.classificacao_id = $${params.length}`)
+  }
+  if (query.alto_risco === 'true')  conds.push(`c.alto_risco_potencial = TRUE`)
+  if (query.alto_risco === 'false') conds.push(`c.alto_risco_potencial = FALSE`)
+  const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''
+  return { where, params }
+}
 
 const MAX_FOTOS = 10
 const MAX_FOTO_BYTES = 8 * 1024 * 1024 // 8 MB por foto
@@ -150,6 +173,125 @@ router.get('/', canView, async (req, res) => {
   } catch (err) {
     console.error('[comunicados] GET / falhou:', err)
     res.status(500).json({ error: 'Erro ao listar comunicados' })
+  }
+})
+
+// GET /api/comunicados/export.xlsx — exporta a listagem (com filtros) em Excel
+router.get('/export.xlsx', canView, async (req, res) => {
+  const { where, params } = buildFilters(req.query)
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT c.id,
+              c.data_comunicado,
+              c.hora_comunicado,
+              c.atividade,
+              c.intervencao_por, c.matricula, c.funcao,
+              c.outros_descricao,
+              c.descricao_observado,
+              c.acoes_imediatas,
+              c.alto_risco_potencial,
+              c.criado_em,
+              cl.descricao AS classificacao_descricao,
+              f.descricao  AS filial_descricao,
+              f.abreviatura AS filial_abreviatura,
+              a.descricao  AS area_descricao,
+              s.descricao  AS setor_descricao,
+              COALESCE((
+                 SELECT STRING_AGG(io.descricao, '; ' ORDER BY io.id)
+                   FROM fato_comunicado_item_observado ci
+                   JOIN dim_item_observado io ON io.id = ci.item_observado_id
+                  WHERE ci.comunicado_id = c.id
+              ), '') AS itens_observados,
+              (SELECT COUNT(*)::int FROM fato_comunicado_foto
+                WHERE comunicado_id = c.id) AS fotos_count
+         FROM fato_comunicado c
+         JOIN dim_classificacao cl ON cl.id = c.classificacao_id
+         JOIN dim_filial        f  ON f.id  = c.filial_id
+         JOIN dim_area          a  ON a.id  = c.area_id
+         JOIN dim_setor         s  ON s.id  = c.setor_id
+         ${where}
+        ORDER BY c.criado_em DESC`,
+      params
+    )
+
+    const wb = new ExcelJS.Workbook()
+    wb.creator = 'Comunicado de Intervenção'
+    wb.created = new Date()
+
+    const sheet = wb.addWorksheet('Comunicados', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    })
+
+    sheet.columns = [
+      { header: 'ID',                  key: 'id',               width: 6  },
+      { header: 'Criado em',           key: 'criado_em',        width: 18 },
+      { header: 'Data',                key: 'data_comunicado',  width: 12 },
+      { header: 'Hora',                key: 'hora_comunicado',  width: 8  },
+      { header: 'Classificação',       key: 'classificacao',    width: 24 },
+      { header: 'Filial',              key: 'filial',           width: 16 },
+      { header: 'Área',                key: 'area',             width: 18 },
+      { header: 'Setor',               key: 'setor',            width: 22 },
+      { header: 'Atividade',           key: 'atividade',        width: 38 },
+      { header: 'Intervenção por',     key: 'intervencao_por',  width: 22 },
+      { header: 'Matrícula',           key: 'matricula',        width: 12 },
+      { header: 'Função',              key: 'funcao',           width: 18 },
+      { header: 'Itens observados',    key: 'itens_observados', width: 40 },
+      { header: 'Outros (descrição)',  key: 'outros_descricao', width: 30 },
+      { header: 'Descrição',           key: 'descricao_observado', width: 40 },
+      { header: 'Ações imediatas',     key: 'acoes_imediatas',  width: 40 },
+      { header: 'Alto risco',          key: 'alto_risco',       width: 10 },
+      { header: 'Fotos',               key: 'fotos_count',      width: 8  },
+    ]
+
+    // Estilo do cabeçalho
+    sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } }
+    sheet.getRow(1).fill = {
+      type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF272525' },
+    }
+    sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'left' }
+    sheet.getRow(1).height = 22
+
+    for (const r of rows) {
+      sheet.addRow({
+        id: r.id,
+        criado_em: r.criado_em ? new Date(r.criado_em).toLocaleString('pt-BR') : '',
+        data_comunicado: r.data_comunicado
+          ? new Date(r.data_comunicado).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+          : '',
+        hora_comunicado: r.hora_comunicado ? String(r.hora_comunicado).slice(0, 5) : '',
+        classificacao: r.classificacao_descricao || '',
+        filial: r.filial_descricao || '',
+        area: r.area_descricao || '',
+        setor: r.setor_descricao || '',
+        atividade: r.atividade || '',
+        intervencao_por: r.intervencao_por || '',
+        matricula: r.matricula || '',
+        funcao: r.funcao || '',
+        itens_observados: r.itens_observados || '',
+        outros_descricao: r.outros_descricao || '',
+        descricao_observado: r.descricao_observado || '',
+        acoes_imediatas: r.acoes_imediatas || '',
+        alto_risco: r.alto_risco_potencial ? 'Sim' : 'Não',
+        fotos_count: r.fotos_count || 0,
+      })
+    }
+
+    // Quebra de linha automática nos campos longos
+    sheet.eachRow({ includeEmpty: false }, (row, rowNum) => {
+      if (rowNum === 1) return
+      row.alignment = { vertical: 'top', wrapText: true }
+    })
+
+    const buffer = await wb.xlsx.writeBuffer()
+    const stamp = new Date().toISOString().slice(0, 10)
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename="comunicados_${stamp}.xlsx"`)
+    res.send(Buffer.from(buffer))
+  } catch (err) {
+    console.error('[comunicados] export.xlsx falhou:', err)
+    res.status(500).json({ error: 'Erro ao gerar Excel' })
   }
 })
 

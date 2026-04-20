@@ -163,6 +163,46 @@ export const comunicadoFotoUrl = (comunicadoId, fotoId) =>
 export const deleteComunicado = (id) =>
   request(`/api/comunicados/${id}`, { method: 'DELETE' })
 
+export async function downloadComunicadosXlsx(filters = {}) {
+  const qs = []
+  if (filters.filial_id)        qs.push(`filial_id=${filters.filial_id}`)
+  if (filters.area_id)          qs.push(`area_id=${filters.area_id}`)
+  if (filters.classificacao_id) qs.push(`classificacao_id=${filters.classificacao_id}`)
+  if (filters.alto_risco === 'sim') qs.push('alto_risco=true')
+  if (filters.alto_risco === 'nao') qs.push('alto_risco=false')
+  const suffix = qs.length ? `?${qs.join('&')}` : ''
+
+  const token = getToken()
+  const res = await fetch(`${apiBase}/api/comunicados/export.xlsx${suffix}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (res.status === 401) {
+    clearSession()
+    const err = new Error('Sessão expirada. Faça login novamente.')
+    err.status = 401
+    throw err
+  }
+  if (!res.ok) {
+    let msg = res.statusText
+    try {
+      const j = await res.json()
+      if (j && j.error) msg = j.error
+    } catch { /* ignore */ }
+    throw new Error(msg || `HTTP ${res.status}`)
+  }
+
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const stamp = new Date().toISOString().slice(0, 10)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `comunicados_${stamp}.xlsx`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
 // ---------- Usuários ----------
 export const getUsuarios = () => request('/api/usuarios')
 

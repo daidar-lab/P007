@@ -110,3 +110,10 @@ export const Close = (p) => (
     <path d="M6 6l12 12M18 6l-12 12" />
   </svg>
 )
+export const Download = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 4v12" />
+    <path d="M7 11l5 5 5-5" />
+    <path d="M4 20h16" />
+  </svg>
+)

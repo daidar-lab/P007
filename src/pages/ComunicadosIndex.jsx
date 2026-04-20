@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import Header from '../components/Header.jsx'
 import Card from '../components/Card.jsx'
 import Badge from '../components/Badge.jsx'
@@ -8,13 +8,14 @@ import Combobox from '../components/Combobox.jsx'
 import SegmentedControl from '../components/SegmentedControl.jsx'
 import { List } from '../components/ListItem.jsx'
 import ListItem from '../components/ListItem.jsx'
-import { Image as ImageIcon } from '../components/Icon.jsx'
+import { Image as ImageIcon, Download } from '../components/Icon.jsx'
 import { navigate } from '../lib/router.js'
 import {
   getComunicados,
   getFiliais,
   getAreas,
   getClassificacoes,
+  downloadComunicadosXlsx,
 } from '../lib/api.js'
 import './ComunicadosIndex.css'
 
@@ -51,6 +52,24 @@ export default function ComunicadosIndex() {
   const [list, setList] = useState([])
   const [status, setStatus] = useState('loading')
   const [error, setError] = useState('')
+
+  // Exportação Excel
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+
+  const doExport = async () => {
+    if (exporting) return
+    setExporting(true)
+    setExportError('')
+    try {
+      await downloadComunicadosXlsx(filters)
+    } catch (err) {
+      setExportError(err.message || 'Falha ao exportar')
+      setTimeout(() => setExportError(''), 4000)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   // Carrega filiais e classificações no mount
   useEffect(() => {
@@ -130,7 +149,21 @@ export default function ComunicadosIndex() {
       <Header
         title="Histórico"
         subtitle={status === 'ok' ? `${list.length} ${list.length === 1 ? 'comunicado' : 'comunicados'}` : undefined}
+        trailing={
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={exporting ? <span className="spinner" aria-hidden="true" /> : <Download width={16} height={16} />}
+            onClick={doExport}
+            disabled={exporting || status !== 'ok' || list.length === 0}
+            aria-label="Exportar para Excel"
+          >
+            {exporting ? 'Gerando…' : 'Exportar'}
+          </Button>
+        }
       />
+
+      {exportError && <p className="crud-error">{exportError}</p>}
 
       <details className="filters-card" open={activeCount > 0}>
         <summary className="filters-card__head">
