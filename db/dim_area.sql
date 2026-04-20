@@ -13,18 +13,14 @@ CREATE TABLE dim_area (
 
 CREATE INDEX ix_dim_area_filial ON dim_area (filial_id);
 
--- Semeia as 8 áreas padrão em todas as filiais ativas
+-- Semeia as áreas padrão em todas as filiais ativas
 INSERT INTO dim_area (descricao, filial_id)
 SELECT a.descricao, f.id
   FROM (VALUES
-          ('Logística'),
-          ('Industrial'),
-          ('Marketing'),
-          ('TI'),
-          ('Compras'),
-          ('ETA'),
-          ('ATDI'),
-          ('Portaria')
+          ('ADMINISTRATIVO'),
+          ('ENGENHARIA'),
+          ('INDUSTRIAL'),
+          ('LOGISTICA')
        ) AS a(descricao)
  CROSS JOIN dim_filial f
  WHERE f.ativo = TRUE;
