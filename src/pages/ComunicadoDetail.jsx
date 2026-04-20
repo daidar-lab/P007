@@ -4,10 +4,12 @@ import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
 import Badge from '../components/Badge.jsx'
 import { ChevronLeft } from '../components/Icon.jsx'
+import AuthedImage from '../components/AuthedImage.jsx'
 import { navigate } from '../lib/router.js'
 import { getComunicado, comunicadoFotoUrl, deleteComunicado } from '../lib/api.js'
 import { getUser } from '../lib/auth.js'
 import { hasPermission, PERMISSIONS } from '../lib/rbac.js'
+import '../components/AuthedImage.css'
 import '../pages/ClassificacoesCrud.css'
 import './ComunicadoDetail.css'
 
@@ -184,10 +186,9 @@ export default function ComunicadoDetail({ id }) {
                       onClick={() => setViewingFoto(f)}
                       aria-label={`Ver ${f.nome_original}`}
                     >
-                      <img
+                      <AuthedImage
                         src={comunicadoFotoUrl(id, f.id)}
                         alt={f.nome_original}
-                        loading="lazy"
                       />
                     </button>
                     <span className="detail-fotos__meta">{formatBytes(f.tamanho_bytes)}</span>
@@ -238,7 +239,7 @@ export default function ComunicadoDetail({ id }) {
           aria-modal="true"
           onClick={() => setViewingFoto(null)}
         >
-          <img
+          <AuthedImage
             src={comunicadoFotoUrl(id, viewingFoto.id)}
             alt={viewingFoto.nome_original}
             onClick={(e) => e.stopPropagation()}
