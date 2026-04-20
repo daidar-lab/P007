@@ -3,6 +3,7 @@ import Card from '../components/Card.jsx'
 import Button from '../components/Button.jsx'
 import Field from '../components/Field.jsx'
 import TextField from '../components/TextField.jsx'
+import BrandLogo from '../components/BrandLogo.jsx'
 import { login as apiLogin } from '../lib/api.js'
 import { setSession } from '../lib/auth.js'
 import './Login.css'
@@ -36,11 +37,8 @@ export default function Login() {
   return (
     <div className="login">
       <div className="login__brand">
-        <div className="login__logo">CI</div>
-        <div>
-          <p className="login__name">Cidade Imperial</p>
-          <p className="login__tag">Comunicado de Intervenção</p>
-        </div>
+        <BrandLogo size="lg" />
+        <p className="login__tag">Comunicado de Intervenção</p>
       </div>
 
       <Card elevated padding="lg" className="login__card stack stack-md">

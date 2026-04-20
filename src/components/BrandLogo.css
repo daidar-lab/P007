@@ -1,0 +1,43 @@
+.brand-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  user-select: none;
+}
+
+.brand-logo__top {
+  font-size: 0.72em;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.38em;
+  text-indent: 0.38em;  /* compensa o letter-spacing pra ficar centrado */
+}
+
+.brand-logo__mid,
+.brand-logo__bot {
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  font-size: 2.9em;
+}
+
+.brand-logo__mid {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.brand-logo__dot {
+  width: 0.28em;
+  height: 0.28em;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* Tamanhos — controlam a base via font-size do container */
+.brand-logo--sm { font-size: 14px; }
+.brand-logo--md { font-size: 18px; }
+.brand-logo--lg { font-size: 22px; }
