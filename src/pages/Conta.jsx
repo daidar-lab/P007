@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Header from '../components/Header.jsx'
 import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
 import Field from '../components/Field.jsx'
 import TextField from '../components/TextField.jsx'
-import { ChevronLeft } from '../components/Icon.jsx'
+import { ChevronLeft, Check } from '../components/Icon.jsx'
 import { navigate } from '../lib/router.js'
 import { getUser } from '../lib/auth.js'
 import { changePassword } from '../lib/api.js'
+import { checklistStatus, validatePasswordStrength } from '../lib/password.js'
 import './Conta.css'
 
 export default function Conta() {
@@ -19,20 +20,15 @@ export default function Conta() {
   const [error, setError]           = useState('')
   const [success, setSuccess]       = useState(false)
 
-  const canSubmit =
-    !saving &&
-    senhaAtual.length > 0 &&
-    novaSenha.length >= 6 &&
-    confirmar.length >= 6
+  const checklist      = useMemo(() => checklistStatus(novaSenha), [novaSenha])
+  const strength       = useMemo(() => validatePasswordStrength(novaSenha), [novaSenha])
+  const confirmOk      = confirmar.length > 0 && novaSenha === confirmar
+  const canSubmit      = !saving && senhaAtual.length > 0 && strength.ok && confirmOk
 
   const save = async () => {
     setError('')
     setSuccess(false)
     if (!canSubmit) return
-    if (novaSenha !== confirmar) {
-      setError('As senhas não coincidem.')
-      return
-    }
     if (novaSenha === senhaAtual) {
       setError('A nova senha deve ser diferente da atual.')
       return
@@ -93,7 +89,7 @@ export default function Conta() {
           />
         </Field>
 
-        <Field label="Nova senha" required hint="Mínimo de 6 caracteres">
+        <Field label="Nova senha" required>
           <TextField
             type="password"
             value={novaSenha}
@@ -103,7 +99,29 @@ export default function Conta() {
           />
         </Field>
 
-        <Field label="Confirmar nova senha" required>
+        <ul className="password-rules">
+          {checklist.map(r => (
+            <li
+              key={r.key}
+              className={`password-rules__item${r.ok ? ' is-ok' : ''}`}
+            >
+              <span className="password-rules__mark" aria-hidden="true">
+                {r.ok ? <Check width={12} height={12} /> : <span className="password-rules__dot" />}
+              </span>
+              <span>{r.label}</span>
+            </li>
+          ))}
+        </ul>
+
+        <Field
+          label="Confirmar nova senha"
+          required
+          hint={
+            confirmar.length > 0 && !confirmOk
+              ? 'As senhas ainda não coincidem.'
+              : undefined
+          }
+        >
           <TextField
             type="password"
             value={confirmar}
@@ -113,7 +131,7 @@ export default function Conta() {
           />
         </Field>
 
-        {error && <p className="conta-error">{error}</p>}
+        {error   && <p className="conta-error">{error}</p>}
         {success && <p className="conta-success">Senha alterada com sucesso.</p>}
 
         <Button

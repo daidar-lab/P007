@@ -2,6 +2,7 @@ import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { pool } from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
+import { validatePasswordStrength } from '../lib/password.js'
 
 const router = Router()
 
@@ -54,8 +55,11 @@ router.post('/change-password', requireAuth, async (req, res) => {
   if (!senhaAtual || !novaSenha) {
     return res.status(400).json({ error: 'senha_atual e nova_senha são obrigatórios' })
   }
-  if (novaSenha.length < 6) {
-    return res.status(400).json({ error: 'a nova senha precisa ter ao menos 6 caracteres' })
+  const strength = validatePasswordStrength(novaSenha)
+  if (!strength.ok) {
+    return res.status(400).json({
+      error: 'A nova senha precisa ter: ' + strength.errors.join(', ') + '.',
+    })
   }
   if (novaSenha === senhaAtual) {
     return res.status(400).json({ error: 'a nova senha deve ser diferente da atual' })

@@ -47,3 +47,46 @@
   font-size: var(--fs-13);
   color: var(--color-accent-success);
 }
+
+.password-rules {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.password-rules__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-12);
+  color: var(--color-text-tertiary);
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+.password-rules__item.is-ok {
+  color: var(--color-accent-success);
+}
+.password-rules__mark {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.password-rules__item.is-ok .password-rules__mark {
+  background: var(--color-accent-success);
+  color: #FFFFFF;
+}
+.password-rules__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border-strong);
+}
