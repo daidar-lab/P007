@@ -9,7 +9,12 @@ if (SECRET === 'dev-secret-change-me') {
 
 export function signToken(user) {
   return jwt.sign(
-    { sub: user.id, usuario: user.usuario, nome: user.nome },
+    {
+      sub:     user.id,
+      usuario: user.usuario,
+      nome:    user.nome,
+      papel:   user.papel,
+    },
     SECRET,
     { expiresIn: EXPIRES_IN }
   )

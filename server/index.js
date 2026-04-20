@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import { pool } from './db.js'
 import { requireAuth } from './middleware/auth.js'
 import authRouter             from './routes/auth.js'
+import usuariosRouter         from './routes/usuarios.js'
 import classificacoesRouter   from './routes/classificacoes.js'
 import filiaisRouter          from './routes/filiais.js'
 import areasRouter            from './routes/areas.js'
@@ -26,6 +27,7 @@ app.use('/api/auth', authRouter)
 // --- Tudo abaixo exige autenticação ---
 app.use('/api', requireAuth)
 
+app.use('/api/usuarios',          usuariosRouter)
 app.use('/api/classificacoes',    classificacoesRouter)
 app.use('/api/filiais',           filiaisRouter)
 app.use('/api/areas',             areasRouter)
@@ -39,11 +41,11 @@ async function ensureAdminUser() {
     if (rows[0].c === 0) {
       const hash = await bcrypt.hash('admin', 10)
       await pool.query(
-        `INSERT INTO dim_usuario (usuario, senha_hash, nome, ativo)
-              VALUES ($1, $2, $3, TRUE)`,
+        `INSERT INTO dim_usuario (usuario, senha_hash, nome, papel, ativo)
+              VALUES ($1, $2, $3, 'admin', TRUE)`,
         ['admin', hash, 'Administrador']
       )
-      console.log('[auth] usuário padrão criado: admin/admin — TROQUE A SENHA')
+      console.log('[auth] usuário padrão criado: admin/admin (papel=admin) — TROQUE A SENHA')
     }
   } catch (err) {
     console.error('[auth] bootstrap do admin falhou:', err.message)

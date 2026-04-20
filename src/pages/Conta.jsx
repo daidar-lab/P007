@@ -71,7 +71,9 @@ export default function Conta() {
           </div>
           <div className="conta-info__body">
             <p className="conta-info__name">{user.nome || '—'}</p>
-            <p className="conta-info__login">@{user.usuario || ''}</p>
+            <p className="conta-info__login">
+              @{user.usuario || ''} · {user.papel_label || user.papel || ''}
+            </p>
           </div>
         </div>
       </Card>

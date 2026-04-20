@@ -1,7 +1,9 @@
 import { Router } from 'express'
+import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 import { pool } from '../db.js'
 
 const router = Router()
+const manage = requirePermission(PERMISSIONS.CADASTROS_MANAGE)
 
 const FULL_SELECT = `
   SELECT s.id, s.descricao, s.area_id, s.ativo,
@@ -78,7 +80,7 @@ async function loadFull(id) {
   return rows[0]
 }
 
-router.post('/', async (req, res) => {
+router.post('/', manage, async (req, res) => {
   const parsed = validatePayload(req.body)
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   const { descricao, area_id, ativo } = parsed.data
@@ -99,7 +101,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.put('/:id(\\d+)', async (req, res) => {
+router.put('/:id(\\d+)', manage, async (req, res) => {
   const parsed = validatePayload(req.body)
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   const { descricao, area_id, ativo } = parsed.data
@@ -121,7 +123,7 @@ router.put('/:id(\\d+)', async (req, res) => {
   }
 })
 
-router.delete('/:id(\\d+)', async (req, res) => {
+router.delete('/:id(\\d+)', manage, async (req, res) => {
   try {
     const { rowCount } = await pool.query(
       `DELETE FROM dim_setor WHERE id = $1`,

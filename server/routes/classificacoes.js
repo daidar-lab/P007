@@ -1,7 +1,10 @@
 import { Router } from 'express'
 import { pool } from '../db.js'
+import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 
 const router = Router()
+
+const manage = requirePermission(PERMISSIONS.CADASTROS_MANAGE)
 
 // GET /api/classificacoes          → todas as classificações
 // GET /api/classificacoes?ativos=true → somente ativas (usado pelo formulário)
@@ -36,7 +39,7 @@ router.get('/:id(\\d+)', async (req, res) => {
 })
 
 // POST /api/classificacoes
-router.post('/', async (req, res) => {
+router.post('/', manage, async (req, res) => {
   const { descricao, ativo = true } = req.body || {}
   if (!descricao || typeof descricao !== 'string' || !descricao.trim()) {
     return res.status(400).json({ error: 'descricao é obrigatória' })
@@ -56,7 +59,7 @@ router.post('/', async (req, res) => {
 })
 
 // PUT /api/classificacoes/:id
-router.put('/:id(\\d+)', async (req, res) => {
+router.put('/:id(\\d+)', manage, async (req, res) => {
   const { descricao, ativo } = req.body || {}
   if (!descricao || typeof descricao !== 'string' || !descricao.trim()) {
     return res.status(400).json({ error: 'descricao é obrigatória' })
@@ -79,7 +82,7 @@ router.put('/:id(\\d+)', async (req, res) => {
 })
 
 // DELETE /api/classificacoes/:id
-router.delete('/:id(\\d+)', async (req, res) => {
+router.delete('/:id(\\d+)', manage, async (req, res) => {
   try {
     const { rowCount } = await pool.query(
       `DELETE FROM dim_classificacao WHERE id = $1`,

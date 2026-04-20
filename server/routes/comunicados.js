@@ -1,7 +1,11 @@
 import { Router } from 'express'
 import { pool } from '../db.js'
+import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 
 const router = Router()
+
+const canView   = requirePermission(PERMISSIONS.HISTORICO_VIEW)
+const canCreate = requirePermission(PERMISSIONS.COMUNICADOS_CREATE)
 
 const MAX_FOTOS = 10
 const MAX_FOTO_BYTES = 8 * 1024 * 1024 // 8 MB por foto
@@ -99,7 +103,7 @@ function validatePayload(body) {
 
 // GET /api/comunicados — lista (sem blobs das fotos)
 // Filtros (query string): filial_id, area_id, classificacao_id, alto_risco=true|false
-router.get('/', async (req, res) => {
+router.get('/', canView, async (req, res) => {
   const params = []
   const conds  = []
   if (req.query.filial_id) {
@@ -149,7 +153,7 @@ router.get('/', async (req, res) => {
 })
 
 // GET /api/comunicados/:id — detalhe completo (metadata das fotos, sem blob)
-router.get('/:id(\\d+)', async (req, res) => {
+router.get('/:id(\\d+)', canView, async (req, res) => {
   try {
     const { rows: comunicadoRows } = await pool.query(
       `SELECT c.id, c.data_comunicado, c.hora_comunicado,
@@ -204,7 +208,7 @@ router.get('/:id(\\d+)', async (req, res) => {
 })
 
 // GET /api/comunicados/:id/fotos/:fotoId — serve o binário da foto
-router.get('/:id(\\d+)/fotos/:fotoId(\\d+)', async (req, res) => {
+router.get('/:id(\\d+)/fotos/:fotoId(\\d+)', canView, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT mime, conteudo
@@ -223,7 +227,7 @@ router.get('/:id(\\d+)/fotos/:fotoId(\\d+)', async (req, res) => {
 })
 
 // POST /api/comunicados
-router.post('/', async (req, res) => {
+router.post('/', canCreate, async (req, res) => {
   const parsed = validatePayload(req.body)
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   const d = parsed.data

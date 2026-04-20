@@ -1,7 +1,9 @@
 import { Router } from 'express'
+import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 import { pool } from '../db.js'
 
 const router = Router()
+const manage = requirePermission(PERMISSIONS.CADASTROS_MANAGE)
 
 const COLS = `id, descricao, abreviatura, codigo_protheus, ativo`
 
@@ -64,7 +66,7 @@ function validatePayload(body) {
 }
 
 // POST /api/filiais
-router.post('/', async (req, res) => {
+router.post('/', manage, async (req, res) => {
   const parsed = validatePayload(req.body)
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   const { descricao, abreviatura, codigo_protheus, ativo } = parsed.data
@@ -85,7 +87,7 @@ router.post('/', async (req, res) => {
 })
 
 // PUT /api/filiais/:id
-router.put('/:id(\\d+)', async (req, res) => {
+router.put('/:id(\\d+)', manage, async (req, res) => {
   const parsed = validatePayload(req.body)
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   const { descricao, abreviatura, codigo_protheus, ativo } = parsed.data
@@ -111,7 +113,7 @@ router.put('/:id(\\d+)', async (req, res) => {
 })
 
 // DELETE /api/filiais/:id
-router.delete('/:id(\\d+)', async (req, res) => {
+router.delete('/:id(\\d+)', manage, async (req, res) => {
   try {
     const { rowCount } = await pool.query(
       `DELETE FROM dim_filial WHERE id = $1`,

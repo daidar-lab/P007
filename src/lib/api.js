@@ -159,3 +159,15 @@ export const getComunicado = (id) =>
 
 export const comunicadoFotoUrl = (comunicadoId, fotoId) =>
   `${apiBase}/api/comunicados/${comunicadoId}/fotos/${fotoId}`
+
+// ---------- Usuários ----------
+export const getUsuarios = () => request('/api/usuarios')
+
+export const createUsuario = (data) =>
+  request('/api/usuarios', { method: 'POST', ...jsonBody(data) })
+
+export const updateUsuario = (id, data) =>
+  request(`/api/usuarios/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const resetUsuarioPassword = (id, senha) =>
+  request(`/api/usuarios/${id}/reset-password`, { method: 'POST', ...jsonBody({ senha }) })

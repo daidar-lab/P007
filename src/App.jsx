@@ -11,22 +11,48 @@ import FiliaisCrud from './pages/FiliaisCrud.jsx'
 import AreasCrud from './pages/AreasCrud.jsx'
 import SetoresCrud from './pages/SetoresCrud.jsx'
 import ItensObservadosCrud from './pages/ItensObservadosCrud.jsx'
+import UsuariosCrud from './pages/UsuariosCrud.jsx'
 import { useHashRoute } from './lib/router.js'
 import { getToken, clearSession } from './lib/auth.js'
 import { getMe } from './lib/api.js'
+import { hasPermission, PERMISSIONS } from './lib/rbac.js'
 
-function renderRoute(route) {
-  if (route === 'home' || route === '')            return <Home />
-  if (route === 'conta')                            return <Conta />
-  if (route === 'comunicados')                      return <ComunicadosIndex />
+function Denied() {
+  return (
+    <div className="screen">
+      <p className="text-muted">
+        Você não tem permissão para acessar esta página.
+      </p>
+    </div>
+  )
+}
+
+function NotFound() {
+  return (
+    <div className="screen">
+      <p className="text-muted">Página não encontrada.</p>
+    </div>
+  )
+}
+
+function renderRoute(route, user) {
+  const guard = (perm, el) => hasPermission(user, perm) ? el : <Denied />
+
+  if (route === 'home' || route === '')  return <Home />
+  if (route === 'conta')                  return <Conta />
+
+  if (route === 'comunicados')            return guard(PERMISSIONS.HISTORICO_VIEW, <ComunicadosIndex />)
   const mDetail = route.match(/^comunicados\/(\d+)$/)
-  if (mDetail)                                      return <ComunicadoDetail id={mDetail[1]} />
-  if (route === 'cadastros')                        return <CadastrosIndex />
-  if (route === 'cadastros/classificacoes')         return <ClassificacoesCrud />
-  if (route === 'cadastros/filiais')                return <FiliaisCrud />
-  if (route === 'cadastros/areas')                  return <AreasCrud />
-  if (route === 'cadastros/setores')                return <SetoresCrud />
-  if (route === 'cadastros/itens-observados')       return <ItensObservadosCrud />
+  if (mDetail)                            return guard(PERMISSIONS.HISTORICO_VIEW, <ComunicadoDetail id={mDetail[1]} />)
+
+  if (route === 'cadastros')              return <CadastrosIndex />
+  if (route === 'cadastros/classificacoes')     return guard(PERMISSIONS.CADASTROS_MANAGE, <ClassificacoesCrud />)
+  if (route === 'cadastros/filiais')            return guard(PERMISSIONS.CADASTROS_MANAGE, <FiliaisCrud />)
+  if (route === 'cadastros/areas')              return guard(PERMISSIONS.CADASTROS_MANAGE, <AreasCrud />)
+  if (route === 'cadastros/setores')            return guard(PERMISSIONS.CADASTROS_MANAGE, <SetoresCrud />)
+  if (route === 'cadastros/itens-observados')   return guard(PERMISSIONS.CADASTROS_MANAGE, <ItensObservadosCrud />)
+  if (route === 'cadastros/usuarios')           return guard(PERMISSIONS.USUARIOS_MANAGE, <UsuariosCrud />)
+
   return <NotFound />
 }
 
@@ -35,8 +61,6 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [ready, setReady] = useState(false)
 
-  // Valida a sessão contra a API no primeiro render.
-  // Enquanto não conclui, NÃO renderiza nem Login nem o app.
   useEffect(() => {
     let cancelled = false
     const token = getToken()
@@ -51,7 +75,6 @@ export default function App() {
     return () => { cancelled = true }
   }, [])
 
-  // Reagir a login/logout emitidos por outros pontos da app
   useEffect(() => {
     const onLogin  = (e) => setUser(e.detail)
     const onLogout = ()  => setUser(null)
@@ -65,7 +88,6 @@ export default function App() {
 
   const logout = () => clearSession()
 
-  // Splash enquanto valida o token (curto — um round-trip)
   if (!ready) {
     return (
       <div className="auth-splash">
@@ -79,15 +101,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <AppNav route={route} user={user} onLogout={logout} />
-      {renderRoute(route)}
-    </div>
-  )
-}
-
-function NotFound() {
-  return (
-    <div className="screen">
-      <p className="text-muted">Página não encontrada.</p>
+      {renderRoute(route, user)}
     </div>
   )
 }

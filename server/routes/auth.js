@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { pool } from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
 import { validatePasswordStrength } from '../lib/password.js'
+import { roleLabel } from '../lib/rbac.js'
 
 const router = Router()
 
@@ -15,7 +16,7 @@ router.post('/login', async (req, res) => {
   }
   try {
     const { rows } = await pool.query(
-      `SELECT id, usuario, senha_hash, nome, ativo
+      `SELECT id, usuario, senha_hash, nome, papel, ativo
          FROM dim_usuario
         WHERE usuario = $1`,
       [usuario]
@@ -31,7 +32,13 @@ router.post('/login', async (req, res) => {
     const token = signToken(user)
     res.json({
       token,
-      user: { id: user.id, usuario: user.usuario, nome: user.nome },
+      user: {
+        id:          user.id,
+        usuario:     user.usuario,
+        nome:        user.nome,
+        papel:       user.papel,
+        papel_label: roleLabel(user.papel),
+      },
     })
   } catch (err) {
     console.error('[auth] login falhou:', err)
@@ -42,9 +49,11 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me — retorna o usuário atual a partir do token
 router.get('/me', requireAuth, (req, res) => {
   res.json({
-    id:      req.user.sub,
-    usuario: req.user.usuario,
-    nome:    req.user.nome,
+    id:          req.user.sub,
+    usuario:     req.user.usuario,
+    nome:        req.user.nome,
+    papel:       req.user.papel,
+    papel_label: roleLabel(req.user.papel),
   })
 })
 
