@@ -11,7 +11,12 @@ import CheckboxGroup from '../components/CheckboxGroup.jsx'
 import Combobox from '../components/Combobox.jsx'
 import PhotoUploader from '../components/PhotoUploader.jsx'
 import { ChevronLeft, ChevronRight } from '../components/Icon.jsx'
-import { getClassificacoes } from '../lib/api.js'
+import {
+  getClassificacoes,
+  getFiliais,
+  getAreas,
+  getSetores,
+} from '../lib/api.js'
 import './Home.css'
 
 const OBSERVACAO_OPTIONS = [
@@ -36,22 +41,6 @@ const STEPS = [
   'Observações',
   'Relato',
   'Fotos & envio',
-]
-
-const EMPRESA_OPTIONS = [
-  { value: 'frutal',     label: 'Frutal' },
-  { value: 'petropolis', label: 'Petrópolis' },
-]
-
-const AREA_OPTIONS = [
-  { value: 'logistica',  label: 'Logística' },
-  { value: 'industrial', label: 'Industrial' },
-  { value: 'marketing',  label: 'Marketing' },
-  { value: 'ti',         label: 'TI' },
-  { value: 'compras',    label: 'Compras' },
-  { value: 'eta',        label: 'ETA' },
-  { value: 'atdi',       label: 'ATDI' },
-  { value: 'portaria',   label: 'Portaria' },
 ]
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -111,6 +100,89 @@ export default function Home() {
       })
     return () => { cancelled = true }
   }, [])
+
+  // Filiais (para o campo Empresa)
+  const [filiais, setFiliais] = useState([])
+  const [filiaisStatus, setFiliaisStatus] = useState('loading')
+  const [filiaisError, setFiliaisError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    setFiliaisStatus('loading')
+    getFiliais(true)
+      .then(rows => {
+        if (cancelled) return
+        setFiliais(rows.map(f => ({ value: String(f.id), label: f.descricao })))
+        setFiliaisStatus('ok')
+      })
+      .catch(err => {
+        if (cancelled) return
+        setFiliaisError(err.message || 'Falha ao carregar')
+        setFiliaisStatus('error')
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  // Áreas da filial selecionada
+  const [areas, setAreas] = useState([])
+  const [areasStatus, setAreasStatus] = useState('idle') // idle | loading | ok | error
+
+  useEffect(() => {
+    if (!form.empresa) {
+      setAreas([])
+      setAreasStatus('idle')
+      return
+    }
+    let cancelled = false
+    setAreasStatus('loading')
+    getAreas({ onlyActive: true, filialId: form.empresa })
+      .then(rows => {
+        if (cancelled) return
+        setAreas(rows.map(a => ({ value: String(a.id), label: a.descricao })))
+        setAreasStatus('ok')
+      })
+      .catch(() => {
+        if (cancelled) return
+        setAreasStatus('error')
+      })
+    return () => { cancelled = true }
+  }, [form.empresa])
+
+  // Setores da área selecionada
+  const [setores, setSetores] = useState([])
+  const [setoresStatus, setSetoresStatus] = useState('idle')
+
+  useEffect(() => {
+    if (!form.area) {
+      setSetores([])
+      setSetoresStatus('idle')
+      return
+    }
+    let cancelled = false
+    setSetoresStatus('loading')
+    getSetores({ onlyActive: true, areaId: form.area })
+      .then(rows => {
+        if (cancelled) return
+        setSetores(rows.map(s => ({ value: String(s.id), label: s.descricao })))
+        setSetoresStatus('ok')
+      })
+      .catch(() => {
+        if (cancelled) return
+        setSetoresStatus('error')
+      })
+    return () => { cancelled = true }
+  }, [form.area])
+
+  // Quando o usuário troca filial, zera área e setor (evita seleção inconsistente)
+  const onEmpresaChange = (v) => {
+    setForm(f => ({ ...f, empresa: v, area: '', setor: '' }))
+  }
+  const onAreaChange = (v) => {
+    setForm(f => ({ ...f, area: v, setor: '' }))
+  }
+  const onSetorChange = (v) => {
+    setForm(f => ({ ...f, setor: v }))
+  }
 
   const set = (k) => (v) => setForm(f => ({ ...f, [k]: v }))
   const onInput = (k) => (e) => set(k)(e.target.value)
@@ -248,12 +320,22 @@ export default function Home() {
         {step === 1 && (
           <Card padding="lg" className="stack stack-md">
             <Field label="Empresa" required>
-              <RadioGroup
-                name="empresa"
-                value={form.empresa}
-                onChange={set('empresa')}
-                options={EMPRESA_OPTIONS}
-              />
+              {filiaisStatus === 'loading' && (
+                <p className="text-muted">Carregando filiais…</p>
+              )}
+              {filiaisStatus === 'error' && (
+                <p className="text-muted" style={{ color: 'var(--color-accent-danger)' }}>
+                  Não foi possível carregar: {filiaisError}
+                </p>
+              )}
+              {filiaisStatus === 'ok' && (
+                <RadioGroup
+                  name="empresa"
+                  value={form.empresa}
+                  onChange={onEmpresaChange}
+                  options={filiais}
+                />
+              )}
             </Field>
             <FieldRow>
               <Field label="Data" hint="Não pode ser futura" required>
@@ -273,17 +355,43 @@ export default function Home() {
                 />
               </Field>
             </FieldRow>
-            <Field label="Área onde a intervenção foi realizada" required>
+            <Field
+              label="Área onde a intervenção foi realizada"
+              required
+              hint={!form.empresa ? 'Selecione a empresa primeiro' : undefined}
+            >
               <Combobox
                 value={form.area}
-                onChange={set('area')}
-                options={AREA_OPTIONS}
-                placeholder="Selecione a área"
+                onChange={onAreaChange}
+                options={areas}
+                placeholder={
+                  !form.empresa            ? 'Selecione a empresa primeiro'
+                  : areasStatus === 'loading' ? 'Carregando áreas…'
+                  : areasStatus === 'error'   ? 'Erro ao carregar áreas'
+                  :                             'Selecione a área'
+                }
                 searchPlaceholder="Buscar área…"
+                emptyLabel={form.empresa ? 'Nenhuma área ativa nesta empresa' : 'Selecione a empresa'}
               />
             </Field>
-            <Field label="Setor onde a intervenção foi realizada" required>
-              <TextField value={form.setor} onChange={onInput('setor')} placeholder="Ex.: Linha 02" />
+            <Field
+              label="Setor onde a intervenção foi realizada"
+              required
+              hint={!form.area ? 'Selecione a área primeiro' : undefined}
+            >
+              <Combobox
+                value={form.setor}
+                onChange={onSetorChange}
+                options={setores}
+                placeholder={
+                  !form.area                  ? 'Selecione a área primeiro'
+                  : setoresStatus === 'loading' ? 'Carregando setores…'
+                  : setoresStatus === 'error'   ? 'Erro ao carregar setores'
+                  :                               'Selecione o setor'
+                }
+                searchPlaceholder="Buscar setor…"
+                emptyLabel={form.area ? 'Nenhum setor ativo nesta área' : 'Selecione a área'}
+              />
             </Field>
             <Field label="Atividade realizada no momento da intervenção" required>
               <TextArea value={form.atividade} onChange={onInput('atividade')} placeholder="Descreva a atividade em andamento" />
