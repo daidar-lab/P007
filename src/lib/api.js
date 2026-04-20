@@ -42,6 +42,12 @@ export const login = (usuario, senha) =>
 
 export const getMe = () => request('/api/auth/me')
 
+export const changePassword = (senha_atual, nova_senha) =>
+  request('/api/auth/change-password', {
+    method: 'POST',
+    ...jsonBody({ senha_atual, nova_senha }),
+  })
+
 // ---------- Classificações ----------
 export const getClassificacoes = (onlyActive = false) =>
   request(`/api/classificacoes${onlyActive ? '?ativos=true' : ''}`)

@@ -7,10 +7,15 @@ export default function AppNav({ route, user, onLogout }) {
     <>
       {user && (
         <div className="app-user">
-          <div className="app-user__info">
+          <button
+            type="button"
+            className="app-user__info"
+            onClick={() => navigate('conta')}
+            aria-label="Abrir minha conta"
+          >
             <span className="app-user__name">{user.nome}</span>
-            <span className="app-user__login">@{user.usuario}</span>
-          </div>
+            <span className="app-user__login">@{user.usuario} · toque para minha conta</span>
+          </button>
           <button type="button" className="app-user__logout" onClick={onLogout}>
             Sair
           </button>

@@ -1,0 +1,49 @@
+.conta-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-1);
+}
+.conta-info__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-14);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.conta-info__body { min-width: 0; }
+.conta-info__name {
+  margin: 0;
+  font-size: var(--fs-15);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+}
+.conta-info__login {
+  margin: 2px 0 0;
+  font-size: var(--fs-12);
+  color: var(--color-text-tertiary);
+}
+
+.conta-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(180, 35, 24, 0.08);
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-13);
+  color: var(--color-accent-danger);
+}
+.conta-success {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(46, 125, 91, 0.10);
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-13);
+  color: var(--color-accent-success);
+}

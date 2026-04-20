@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import AppNav from './components/AppNav.jsx'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
+import Conta from './pages/Conta.jsx'
 import ComunicadosIndex from './pages/ComunicadosIndex.jsx'
 import ComunicadoDetail from './pages/ComunicadoDetail.jsx'
 import CadastrosIndex from './pages/CadastrosIndex.jsx'
@@ -16,6 +17,7 @@ import { getMe } from './lib/api.js'
 
 function renderRoute(route) {
   if (route === 'home' || route === '')            return <Home />
+  if (route === 'conta')                            return <Conta />
   if (route === 'comunicados')                      return <ComunicadosIndex />
   const mDetail = route.match(/^comunicados\/(\d+)$/)
   if (mDetail)                                      return <ComunicadoDetail id={mDetail[1]} />

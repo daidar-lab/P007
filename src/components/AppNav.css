@@ -9,7 +9,20 @@
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-inset);
 }
-.app-user__info { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+.app-user__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+  padding: 0;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease-standard);
+  cursor: pointer;
+}
+.app-user__info:hover { background: rgba(0, 0, 0, 0.04); }
 .app-user__name {
   font-size: var(--fs-13);
   font-weight: var(--fw-semibold);

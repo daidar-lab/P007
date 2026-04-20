@@ -47,4 +47,41 @@ router.get('/me', requireAuth, (req, res) => {
   })
 })
 
+// POST /api/auth/change-password — usuário logado troca a própria senha
+router.post('/change-password', requireAuth, async (req, res) => {
+  const senhaAtual = String(req.body?.senha_atual ?? '')
+  const novaSenha  = String(req.body?.nova_senha  ?? '')
+  if (!senhaAtual || !novaSenha) {
+    return res.status(400).json({ error: 'senha_atual e nova_senha são obrigatórios' })
+  }
+  if (novaSenha.length < 6) {
+    return res.status(400).json({ error: 'a nova senha precisa ter ao menos 6 caracteres' })
+  }
+  if (novaSenha === senhaAtual) {
+    return res.status(400).json({ error: 'a nova senha deve ser diferente da atual' })
+  }
+  try {
+    const { rows } = await pool.query(
+      `SELECT senha_hash FROM dim_usuario WHERE id = $1 AND ativo = TRUE`,
+      [req.user.sub]
+    )
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' })
+    }
+    const ok = await bcrypt.compare(senhaAtual, rows[0].senha_hash)
+    if (!ok) {
+      return res.status(401).json({ error: 'Senha atual incorreta' })
+    }
+    const newHash = await bcrypt.hash(novaSenha, 10)
+    await pool.query(
+      `UPDATE dim_usuario SET senha_hash = $1 WHERE id = $2`,
+      [newHash, req.user.sub]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('[auth] change-password falhou:', err)
+    res.status(500).json({ error: 'Erro ao alterar senha' })
+  }
+})
+
 export default router
