@@ -44,7 +44,7 @@ const emptyForm = () => {
     classificacao: '',
     empresa: '',
     data: date, hora: time,
-    area: '', setor: '',
+    area: '', setor: '', subsetor: '',
     atividade: '',
     intervencaoPor: '',
     matricula: '', funcao: '',
@@ -210,10 +210,10 @@ export default function Home() {
 
   // Quando o usuário troca filial, zera área e setor (evita seleção inconsistente)
   const onEmpresaChange = (v) => {
-    setForm(f => ({ ...f, empresa: v, area: '', setor: '' }))
+    setForm(f => ({ ...f, empresa: v, area: '', setor: '', subsetor: '' }))
   }
   const onAreaChange = (v) => {
-    setForm(f => ({ ...f, area: v, setor: '' }))
+    setForm(f => ({ ...f, area: v, setor: '', subsetor: '' }))
   }
   const onSetorChange = (v) => {
     setForm(f => ({ ...f, setor: v }))
@@ -315,6 +315,7 @@ export default function Home() {
         filial_id:            Number(form.empresa),
         area_id:              Number(form.area),
         setor_id:             Number(form.setor),
+        subsetor:             form.subsetor.trim() || null,
         data_comunicado:      form.data,
         hora_comunicado:      form.hora,
         atividade:            form.atividade.trim(),
@@ -465,6 +466,14 @@ export default function Home() {
                 }
                 searchPlaceholder="Buscar setor…"
                 emptyLabel={form.area ? 'Nenhum setor ativo nesta área' : 'Selecione a área'}
+              />
+            </Field>
+            <Field label="Subsetor" hint="Opcional — detalhe específico dentro do setor">
+              <TextField
+                value={form.subsetor}
+                onChange={onInput('subsetor')}
+                placeholder="Ex.: Linha 02, Galpão A, Box 03"
+                maxLength={120}
               />
             </Field>
             <Field label="Atividade realizada no momento da intervenção" required>

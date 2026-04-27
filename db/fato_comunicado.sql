@@ -12,6 +12,7 @@ CREATE TABLE fato_comunicado (
     filial_id               INT           NOT NULL REFERENCES dim_filial        (id),
     area_id                 INT           NOT NULL REFERENCES dim_area          (id),
     setor_id                INT           NOT NULL REFERENCES dim_setor         (id),
+    subsetor                VARCHAR(120),
 
     -- Data/hora do comunicado (o front bloqueia valor futuro)
     data_comunicado         DATE          NOT NULL,

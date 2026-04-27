@@ -116,6 +116,9 @@ function validatePayload(body) {
     outros_descricao:     body?.outros_descricao
       ? String(body.outros_descricao).trim().slice(0, 200) || null
       : null,
+    subsetor:             body?.subsetor
+      ? String(body.subsetor).trim().slice(0, 120) || null
+      : null,
     alto_risco_potencial: body?.alto_risco_potencial === true || body?.alto_risco_potencial === 'true',
     itens_observados_ids: itens,
     fotos,
@@ -192,6 +195,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
               c.acoes_imediatas,
               c.alto_risco_potencial,
               c.criado_em,
+              c.subsetor,
               cl.descricao AS classificacao_descricao,
               f.descricao  AS filial_descricao,
               f.abreviatura AS filial_abreviatura,
@@ -232,6 +236,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
       { header: 'Filial',              key: 'filial',           width: 16 },
       { header: 'Área',                key: 'area',             width: 18 },
       { header: 'Setor',               key: 'setor',            width: 22 },
+      { header: 'Subsetor',            key: 'subsetor',         width: 22 },
       { header: 'Atividade',           key: 'atividade',        width: 38 },
       { header: 'Intervenção por',     key: 'intervencao_por',  width: 22 },
       { header: 'Matrícula',           key: 'matricula',        width: 12 },
@@ -264,6 +269,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
         filial: r.filial_descricao || '',
         area: r.area_descricao || '',
         setor: r.setor_descricao || '',
+        subsetor: r.subsetor || '',
         atividade: r.atividade || '',
         intervencao_por: r.intervencao_por || '',
         matricula: r.matricula || '',
@@ -303,7 +309,7 @@ router.get('/:id(\\d+)', canView, async (req, res) => {
               c.atividade, c.intervencao_por, c.matricula, c.funcao,
               c.outros_descricao, c.descricao_observado, c.acoes_imediatas,
               c.alto_risco_potencial, c.criado_em,
-              c.classificacao_id, c.filial_id, c.area_id, c.setor_id,
+              c.classificacao_id, c.filial_id, c.area_id, c.setor_id, c.subsetor,
               cl.descricao     AS classificacao_descricao,
               f.descricao      AS filial_descricao,
               f.abreviatura    AS filial_abreviatura,
@@ -381,7 +387,7 @@ router.post('/', canCreate, async (req, res) => {
 
     const { rows: [created] } = await client.query(
       `INSERT INTO fato_comunicado (
-          classificacao_id, filial_id, area_id, setor_id,
+          classificacao_id, filial_id, area_id, setor_id, subsetor,
           data_comunicado, hora_comunicado,
           atividade,
           intervencao_por, matricula, funcao,
@@ -389,10 +395,10 @@ router.post('/', canCreate, async (req, res) => {
           descricao_observado, acoes_imediatas,
           alto_risco_potencial
        )
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        RETURNING id, criado_em`,
       [
-        d.classificacao_id, d.filial_id, d.area_id, d.setor_id,
+        d.classificacao_id, d.filial_id, d.area_id, d.setor_id, d.subsetor,
         d.data_comunicado, d.hora_comunicado,
         d.atividade,
         d.intervencao_por, d.matricula, d.funcao,

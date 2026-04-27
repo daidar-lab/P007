@@ -135,6 +135,7 @@ export default function ComunicadoDetail({ id }) {
             </Kv>
             <Kv label="Área">{data.area_descricao}</Kv>
             <Kv label="Setor">{data.setor_descricao}</Kv>
+            {data.subsetor && <Kv label="Subsetor">{data.subsetor}</Kv>}
             <Kv label="Data e hora">
               {formatData(data.data_comunicado)} às {formatHora(data.hora_comunicado)}
             </Kv>
