@@ -3,6 +3,7 @@ import Header from '../components/Header.jsx'
 import Button from '../components/Button.jsx'
 import Card from '../components/Card.jsx'
 import Badge from '../components/Badge.jsx'
+import ReactMarkdown from 'react-markdown'
 import { ChevronLeft } from '../components/Icon.jsx'
 import AuthedImage from '../components/AuthedImage.jsx'
 import { navigate } from '../lib/router.js'
@@ -196,7 +197,9 @@ export default function ComunicadoDetail({ id }) {
                     {f.analise_ia && (
                       <div className="detail-fotos__analise">
                         <span className="detail-fotos__analise-tag">Análise IA</span>
-                        <p>{f.analise_ia}</p>
+                        <div className="detail-fotos__analise-text markdown">
+                          <ReactMarkdown>{f.analise_ia}</ReactMarkdown>
+                        </div>
                       </div>
                     )}
                   </li>
