@@ -36,6 +36,10 @@ export function isEnabled() {
   return !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY)
 }
 
+export function describe() {
+  return { enabled: isEnabled(), region: REGION, model: MODEL_ID }
+}
+
 // MIME → formato aceito pela ConverseCommand (jpeg | png | gif | webp)
 function mimeToFormat(mime) {
   if (!mime) return null
@@ -55,9 +59,15 @@ function mimeToFormat(mime) {
  * @returns {Promise<string|null>} Texto da análise ou null em caso de falha.
  */
 export async function analyzePhoto(buffer, mime) {
-  if (!isEnabled()) return null
+  if (!isEnabled()) {
+    console.warn('[bedrock] desabilitado (AWS_ACCESS_KEY_ID vazio) — pulando análise')
+    return null
+  }
   const format = mimeToFormat(mime)
-  if (!format) return null
+  if (!format) {
+    console.warn(`[bedrock] MIME não suportado: ${mime} — pulando análise`)
+    return null
+  }
 
   const client = getClient()
 
@@ -65,32 +75,31 @@ export async function analyzePhoto(buffer, mime) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), 60_000)
 
+  const t0 = Date.now()
   try {
     const cmd = new ConverseCommand({
       modelId: MODEL_ID,
       messages: [{
         role: 'user',
         content: [
-          {
-            image: {
-              format,
-              source: { bytes: buffer },
-            },
-          },
+          { image: { format, source: { bytes: buffer } } },
           { text: PROMPT },
         ],
       }],
-      inferenceConfig: {
-        maxTokens: MAX_TOKENS,
-        temperature: 0.2,
-      },
+      inferenceConfig: { maxTokens: MAX_TOKENS, temperature: 0.2 },
     })
     const response = await client.send(cmd, { abortSignal: ctrl.signal })
     const blocks = response?.output?.message?.content || []
     const text = blocks.map(b => b.text).filter(Boolean).join('\n').trim()
+    console.log(`[bedrock] ok em ${Date.now() - t0}ms (${text.length} chars, ${buffer.length} bytes ${format})`)
     return text || null
   } catch (err) {
-    console.error('[bedrock] analyzePhoto falhou:', err.message)
+    const status = err.$metadata?.httpStatusCode ?? '?'
+    const reqId  = err.$metadata?.requestId ?? '-'
+    console.error(
+      `[bedrock] FALHA ${err.name || 'Error'} ` +
+      `(http=${status} requestId=${reqId} model=${MODEL_ID} region=${REGION}): ${err.message}`
+    )
     return null
   } finally {
     clearTimeout(timer)

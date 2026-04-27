@@ -3,7 +3,8 @@ import bcrypt from 'bcryptjs'
 import { pool } from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
 import { validatePasswordStrength } from '../lib/password.js'
-import { roleLabel } from '../lib/rbac.js'
+import { roleLabel, requirePermission, PERMISSIONS } from '../lib/rbac.js'
+import { describe as describeBedrock, analyzePhoto } from '../lib/bedrock.js'
 
 const router = Router()
 
@@ -94,6 +95,39 @@ router.post('/change-password', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('[auth] change-password falhou:', err)
     res.status(500).json({ error: 'Erro ao alterar senha' })
+  }
+})
+
+// GET  /api/auth/bedrock-status — admin diagnostica config (sem chamar a API)
+// POST /api/auth/bedrock-status — admin dispara teste real com imagem 1x1 PNG
+const BEDROCK_TEST_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'base64'
+)
+
+router.get('/bedrock-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), (_req, res) => {
+  res.json(describeBedrock())
+})
+
+router.post('/bedrock-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), async (_req, res) => {
+  const cfg = describeBedrock()
+  if (!cfg.enabled) {
+    return res.status(400).json({ ok: false, error: 'Bedrock desabilitado (AWS_ACCESS_KEY_ID vazio em .env)', ...cfg })
+  }
+  const t0 = Date.now()
+  try {
+    const text = await analyzePhoto(BEDROCK_TEST_PNG, 'image/png')
+    if (!text) {
+      return res.status(502).json({
+        ok: false,
+        ...cfg,
+        elapsed_ms: Date.now() - t0,
+        error: 'Resposta vazia ou erro silencioso. Verifique os logs do servidor — o erro foi logado com requestId.',
+      })
+    }
+    res.json({ ok: true, ...cfg, elapsed_ms: Date.now() - t0, sample: text.slice(0, 200) })
+  } catch (err) {
+    res.status(500).json({ ok: false, ...cfg, error: err.message })
   }
 })
 
