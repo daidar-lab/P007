@@ -2,7 +2,7 @@ import { Router } from 'express'
 import ExcelJS from 'exceljs'
 import { pool } from '../db.js'
 import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
-import { analyzePhotos } from '../lib/bedrock.js'
+import { analyzePhotos } from '../lib/groq.js'
 
 const router = Router()
 

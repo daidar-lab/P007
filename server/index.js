@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs'
 import { pool } from './db.js'
 import { requireAuth } from './middleware/auth.js'
 import { migrate } from './lib/migrate.js'
-import { describe as describeBedrock } from './lib/bedrock.js'
+import { describe as describeIa } from './lib/groq.js'
 import authRouter             from './routes/auth.js'
 import usuariosRouter         from './routes/usuarios.js'
 import classificacoesRouter   from './routes/classificacoes.js'
@@ -63,10 +63,10 @@ app.listen(port, async () => {
     console.error('[migrate] A API continua de pé, mas algumas rotas podem falhar.')
   }
   await ensureAdminUser()
-  const b = describeBedrock()
+  const b = describeIa()
   if (b.enabled) {
-    console.log(`[bedrock] habilitado — model="${b.model}" region="${b.region}"`)
+    console.log(`[ia] habilitada — provider="${b.provider}" model="${b.model}"`)
   } else {
-    console.log('[bedrock] desabilitado — defina AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY em .env para ativar')
+    console.log('[ia] desabilitada — defina GROQ_API_KEY em .env para ativar')
   }
 })

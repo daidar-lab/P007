@@ -4,7 +4,7 @@ import { pool } from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
 import { validatePasswordStrength } from '../lib/password.js'
 import { roleLabel, requirePermission, PERMISSIONS } from '../lib/rbac.js'
-import { describe as describeBedrock, analyzePhoto } from '../lib/bedrock.js'
+import { describe as describeIa, analyzePhoto as analyzePhotoIa } from '../lib/groq.js'
 
 const router = Router()
 
@@ -98,31 +98,31 @@ router.post('/change-password', requireAuth, async (req, res) => {
   }
 })
 
-// GET  /api/auth/bedrock-status — admin diagnostica config (sem chamar a API)
-// POST /api/auth/bedrock-status — admin dispara teste real com imagem 1x1 PNG
-const BEDROCK_TEST_PNG = Buffer.from(
+// GET  /api/auth/ia-status — admin diagnostica config (sem chamar a API)
+// POST /api/auth/ia-status — admin dispara teste real com imagem 1x1 PNG
+const IA_TEST_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   'base64'
 )
 
-router.get('/bedrock-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), (_req, res) => {
-  res.json(describeBedrock())
+router.get('/ia-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), (_req, res) => {
+  res.json(describeIa())
 })
 
-router.post('/bedrock-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), async (_req, res) => {
-  const cfg = describeBedrock()
+router.post('/ia-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), async (_req, res) => {
+  const cfg = describeIa()
   if (!cfg.enabled) {
-    return res.status(400).json({ ok: false, error: 'Bedrock desabilitado (AWS_ACCESS_KEY_ID vazio em .env)', ...cfg })
+    return res.status(400).json({ ok: false, error: 'IA desabilitada (GROQ_API_KEY vazio em .env)', ...cfg })
   }
   const t0 = Date.now()
   try {
-    const text = await analyzePhoto(BEDROCK_TEST_PNG, 'image/png')
+    const text = await analyzePhotoIa(IA_TEST_PNG, 'image/png')
     if (!text) {
       return res.status(502).json({
         ok: false,
         ...cfg,
         elapsed_ms: Date.now() - t0,
-        error: 'Resposta vazia ou erro silencioso. Verifique os logs do servidor — o erro foi logado com requestId.',
+        error: 'Resposta vazia ou erro silencioso. Verifique os logs do servidor.',
       })
     }
     res.json({ ok: true, ...cfg, elapsed_ms: Date.now() - t0, sample: text.slice(0, 200) })
