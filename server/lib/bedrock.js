@@ -1,7 +1,7 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime'
+import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime'
 
-const REGION    = process.env.AWS_REGION    || 'us-east-1'
-const MODEL_ID  = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-opus-4-5-20250722-v1:0'
+const REGION    = process.env.AWS_REGION       || 'us-east-1'
+const MODEL_ID  = process.env.BEDROCK_MODEL_ID || 'us.anthropic.claude-haiku-4-5-20251001-v1:0'
 const MAX_TOKENS = 600
 
 const PROMPT = `Você é um especialista em Segurança do Trabalho analisando uma foto enviada num Comunicado de Intervenção.
@@ -36,52 +36,58 @@ export function isEnabled() {
   return !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY)
 }
 
+// MIME → formato aceito pela ConverseCommand (jpeg | png | gif | webp)
+function mimeToFormat(mime) {
+  if (!mime) return null
+  const m = String(mime).toLowerCase()
+  if (m === 'image/jpeg' || m === 'image/jpg') return 'jpeg'
+  if (m === 'image/png')  return 'png'
+  if (m === 'image/gif')  return 'gif'
+  if (m === 'image/webp') return 'webp'
+  return null
+}
+
 /**
- * Analisa uma foto via Bedrock e retorna um texto descritivo.
- * @param {Buffer} buffer  Bytes da imagem.
+ * Analisa uma foto via Bedrock Converse API e retorna um texto descritivo.
+ * @param {Buffer} buffer  Bytes da imagem (Buffer estende Uint8Array — vai
+ *                         direto em `source.bytes`, sem precisar de base64).
  * @param {string} mime    MIME type (image/jpeg, image/png, image/webp, image/gif).
  * @returns {Promise<string|null>} Texto da análise ou null em caso de falha.
  */
 export async function analyzePhoto(buffer, mime) {
   if (!isEnabled()) return null
-  // O modelo aceita: jpeg, png, gif, webp
-  const allowed = /^image\/(jpeg|png|gif|webp)$/i
-  if (!allowed.test(mime)) return null
+  const format = mimeToFormat(mime)
+  if (!format) return null
 
   const client = getClient()
-  const body = {
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: MAX_TOKENS,
-    messages: [{
-      role: 'user',
-      content: [
-        {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: mime,
-            data: buffer.toString('base64'),
-          },
-        },
-        { type: 'text', text: PROMPT },
-      ],
-    }],
-  }
 
   // AbortController dá um teto de 60s por análise (o SDK tem retries internos)
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), 60_000)
 
   try {
-    const cmd = new InvokeModelCommand({
+    const cmd = new ConverseCommand({
       modelId: MODEL_ID,
-      body: JSON.stringify(body),
-      contentType: 'application/json',
-      accept: 'application/json',
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            image: {
+              format,
+              source: { bytes: buffer },
+            },
+          },
+          { text: PROMPT },
+        ],
+      }],
+      inferenceConfig: {
+        maxTokens: MAX_TOKENS,
+        temperature: 0.2,
+      },
     })
     const response = await client.send(cmd, { abortSignal: ctrl.signal })
-    const json = JSON.parse(new TextDecoder().decode(response.body))
-    const text = (json.content || []).map(c => c.text).filter(Boolean).join('\n').trim()
+    const blocks = response?.output?.message?.content || []
+    const text = blocks.map(b => b.text).filter(Boolean).join('\n').trim()
     return text || null
   } catch (err) {
     console.error('[bedrock] analyzePhoto falhou:', err.message)
