@@ -4,6 +4,7 @@ import cors from 'cors'
 import bcrypt from 'bcryptjs'
 import { pool } from './db.js'
 import { requireAuth } from './middleware/auth.js'
+import { migrate } from './lib/migrate.js'
 import authRouter             from './routes/auth.js'
 import usuariosRouter         from './routes/usuarios.js'
 import classificacoesRouter   from './routes/classificacoes.js'
@@ -54,5 +55,11 @@ async function ensureAdminUser() {
 
 app.listen(port, async () => {
   console.log(`[api] ouvindo em http://localhost:${port}`)
+  try {
+    await migrate()
+  } catch (err) {
+    console.error('[migrate] FALHA no bootstrap do schema:', err.message)
+    console.error('[migrate] A API continua de pé, mas algumas rotas podem falhar.')
+  }
   await ensureAdminUser()
 })
