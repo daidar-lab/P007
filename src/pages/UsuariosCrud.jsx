@@ -277,7 +277,7 @@ export default function UsuariosCrud() {
 
   // ---------- MODO: LISTA ----------
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={<Button variant="ghost" size="sm" icon={<ChevronLeft width={18} height={18} />} onClick={() => navigate('cadastros')} aria-label="Voltar" />}
         title="Usuários"

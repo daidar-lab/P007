@@ -101,6 +101,45 @@ a { color: inherit; text-decoration: none; }
   .app-shell { max-width: var(--container-wide); }
 }
 
+/* Desktop: app ocupa coluna larga; cada página decide se é estreita
+   (forms, edit) ou ampla (listas, dashboards, detalhe). */
+@media (min-width: 1024px) {
+  body { font-size: 15px; }   /* +1px de leitura no desktop */
+
+  .app-shell {
+    max-width: 1140px;
+    padding: var(--space-7) var(--space-7);
+  }
+
+  /* Default = página de formulário centralizada (UX ideal) */
+  .screen {
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+    padding: var(--space-5) 0;
+  }
+
+  /* Lista / dashboard / detalhe usa toda a largura disponível */
+  .screen--wide {
+    max-width: 100%;
+  }
+
+  /* AppNav ocupa toda a largura, mas com tabs maiores e mais espaçadas */
+  .app-nav {
+    max-width: 100%;
+    gap: var(--space-2);
+  }
+  .app-nav__item {
+    height: 44px;
+    font-size: var(--fs-14);
+  }
+
+  /* Barra do usuário acompanha o app-shell */
+  .app-user {
+    padding: var(--space-3) var(--space-5);
+  }
+}
+
 /* Layout empilhado típico do app */
 .screen {
   display: flex;

@@ -292,7 +292,7 @@ export default function SetoresCrud() {
   // --- modo list ---
   const canCreate = filiais.length > 0 && areas.length > 0
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={
           <Button

@@ -244,7 +244,7 @@ export default function AreasCrud() {
 
   // --- modo list ---
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={
           <Button

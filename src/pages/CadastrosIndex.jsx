@@ -51,7 +51,7 @@ export default function CadastrosIndex() {
   const visiveis = ENTIDADES.filter(e => hasPermission(user, e.perm))
 
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         title="Cadastros"
         subtitle="Gerencie as listas usadas no Comunicado"

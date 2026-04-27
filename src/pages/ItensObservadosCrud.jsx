@@ -192,7 +192,7 @@ export default function ItensObservadosCrud() {
 
   // --- modo list ---
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={
           <Button

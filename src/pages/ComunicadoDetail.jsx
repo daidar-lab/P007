@@ -98,7 +98,7 @@ export default function ComunicadoDetail({ id }) {
   }
 
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={
           <Button
@@ -117,7 +117,8 @@ export default function ComunicadoDetail({ id }) {
       {status === 'error'   && <p className="crud-error">Erro: {error}</p>}
 
       {status === 'ok' && data && (
-        <div className="stack stack-md">
+        <div className="detail-grid">
+          <div className="detail-grid__main stack stack-md">
           <Card elevated padding="lg" className="stack stack-md">
             <div className="row row-between">
               <span className="text-section">Classificação</span>
@@ -171,7 +172,9 @@ export default function ComunicadoDetail({ id }) {
             <Kv label="Descrição do que foi observado">{data.descricao_observado}</Kv>
             <Kv label="Ações imediatas">{data.acoes_imediatas}</Kv>
           </Card>
+          </div>
 
+          <div className="detail-grid__aside stack stack-md">
           <Card padding="lg" className="stack stack-md">
             <span className="text-section">
               Fotos {data.fotos.length > 0 ? `(${data.fotos.length})` : ''}
@@ -239,6 +242,7 @@ export default function ComunicadoDetail({ id }) {
               )}
             </div>
           )}
+          </div>
         </div>
       )}
 

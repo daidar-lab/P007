@@ -145,7 +145,7 @@ export default function ComunicadosIndex() {
   const clearFilters = () => setFilters(EMPTY_FILTERS)
 
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         title="Histórico"
         subtitle={status === 'ok' ? `${list.length} ${list.length === 1 ? 'comunicado' : 'comunicados'}` : undefined}

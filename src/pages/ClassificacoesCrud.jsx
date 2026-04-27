@@ -194,7 +194,7 @@ export default function ClassificacoesCrud() {
 
   // --- modo list ---
   return (
-    <div className="screen">
+    <div className="screen screen--wide">
       <Header
         leading={
           <Button
