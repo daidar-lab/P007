@@ -193,6 +193,12 @@ export default function ComunicadoDetail({ id }) {
                       />
                     </button>
                     <span className="detail-fotos__meta">{formatBytes(f.tamanho_bytes)}</span>
+                    {f.analise_ia && (
+                      <div className="detail-fotos__analise">
+                        <span className="detail-fotos__analise-tag">Análise IA</span>
+                        <p>{f.analise_ia}</p>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

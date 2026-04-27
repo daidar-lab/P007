@@ -8,6 +8,7 @@ CREATE TABLE fato_comunicado_foto (
     mime            VARCHAR(100)  NOT NULL,
     tamanho_bytes   INT           NOT NULL,
     conteudo        BYTEA         NOT NULL,
+    analise_ia      TEXT,
     criado_em       TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 

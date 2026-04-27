@@ -2,6 +2,7 @@ import { Router } from 'express'
 import ExcelJS from 'exceljs'
 import { pool } from '../db.js'
 import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
+import { analyzePhotos } from '../lib/bedrock.js'
 
 const router = Router()
 
@@ -208,7 +209,21 @@ router.get('/export.xlsx', canView, async (req, res) => {
                   WHERE ci.comunicado_id = c.id
               ), '') AS itens_observados,
               (SELECT COUNT(*)::int FROM fato_comunicado_foto
-                WHERE comunicado_id = c.id) AS fotos_count
+                WHERE comunicado_id = c.id) AS fotos_count,
+              COALESCE((
+                 SELECT STRING_AGG(
+                          'Foto #' || row_number || ': ' || analise_ia,
+                          E'\n\n'
+                          ORDER BY row_number
+                        )
+                   FROM (
+                     SELECT analise_ia,
+                            ROW_NUMBER() OVER (ORDER BY id) AS row_number
+                       FROM fato_comunicado_foto
+                      WHERE comunicado_id = c.id
+                        AND analise_ia IS NOT NULL
+                   ) sub
+              ), '') AS fotos_analise
          FROM fato_comunicado c
          JOIN dim_classificacao cl ON cl.id = c.classificacao_id
          JOIN dim_filial        f  ON f.id  = c.filial_id
@@ -247,6 +262,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
       { header: 'Ações imediatas',     key: 'acoes_imediatas',  width: 40 },
       { header: 'Alto risco',          key: 'alto_risco',       width: 10 },
       { header: 'Fotos',               key: 'fotos_count',      width: 8  },
+      { header: 'Análise IA das fotos',key: 'fotos_analise',    width: 60 },
     ]
 
     // Estilo do cabeçalho
@@ -280,6 +296,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
         acoes_imediatas: r.acoes_imediatas || '',
         alto_risco: r.alto_risco_potencial ? 'Sim' : 'Não',
         fotos_count: r.fotos_count || 0,
+        fotos_analise: r.fotos_analise || '',
       })
     }
 
@@ -338,7 +355,7 @@ router.get('/:id(\\d+)', canView, async (req, res) => {
     )
 
     const { rows: fotos } = await pool.query(
-      `SELECT id, nome_original, mime, tamanho_bytes, criado_em
+      `SELECT id, nome_original, mime, tamanho_bytes, analise_ia, criado_em
          FROM fato_comunicado_foto
         WHERE comunicado_id = $1
         ORDER BY id`,
@@ -420,13 +437,16 @@ router.post('/', canCreate, async (req, res) => {
       )
     }
 
-    // Fotos — BYTEA na mesma transação
-    for (const f of d.fotos) {
+    // Fotos — BYTEA na mesma transação. Antes do INSERT, dispara a análise
+    // por IA (Amazon Bedrock) em paralelo. Se a análise falhar, o campo
+    // analise_ia fica NULL e a foto é gravada normalmente.
+    const fotosComAnalise = await analyzePhotos(d.fotos)
+    for (const f of fotosComAnalise) {
       await client.query(
         `INSERT INTO fato_comunicado_foto
-           (comunicado_id, nome_original, mime, tamanho_bytes, conteudo)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [created.id, f.nome, f.mime, f.bytes, f.buffer]
+           (comunicado_id, nome_original, mime, tamanho_bytes, conteudo, analise_ia)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [created.id, f.nome, f.mime, f.bytes, f.buffer, f.analise_ia]
       )
     }
 
