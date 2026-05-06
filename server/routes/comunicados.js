@@ -33,7 +33,7 @@ function buildFilters(query) {
 }
 
 const MAX_FOTOS = 10
-const MAX_FOTO_BYTES = 8 * 1024 * 1024 // 8 MB por foto
+const MAX_FOTO_BYTES = 5 * 1024 * 1024 // 5 MB por foto (front já redimensiona ~1 MB)
 const MIME_PERMITIDO = /^image\//
 
 function validatePayload(body) {
