@@ -36,6 +36,9 @@ CREATE TABLE fato_comunicado (
     -- A classificação deste reporte é de Alto Risco Potencial?
     alto_risco_potencial    BOOLEAN       NOT NULL,
 
+    -- O gestor foi informado?
+    gestor_informado        BOOLEAN       NOT NULL DEFAULT FALSE,
+
     -- Auditoria
     criado_em               TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );

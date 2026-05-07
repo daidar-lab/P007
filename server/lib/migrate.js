@@ -36,6 +36,7 @@ const ORDERED_FILES = [
   'dim_usuario_add_papel.sql',
   'fato_comunicado_add_subsetor.sql',
   'fato_comunicado_foto_add_analise.sql',
+  'fato_comunicado_add_gestor_informado.sql',
 ]
 
 const ALREADY_EXISTS_CODES = new Set([

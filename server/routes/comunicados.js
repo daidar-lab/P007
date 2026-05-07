@@ -121,6 +121,7 @@ function validatePayload(body) {
       ? String(body.subsetor).trim().slice(0, 120) || null
       : null,
     alto_risco_potencial: body?.alto_risco_potencial === true || body?.alto_risco_potencial === 'true',
+    gestor_informado:     body?.gestor_informado === true || body?.gestor_informado === 'true',
     itens_observados_ids: itens,
     fotos,
   }
@@ -195,6 +196,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
               c.descricao_observado,
               c.acoes_imediatas,
               c.alto_risco_potencial,
+              c.gestor_informado,
               c.criado_em,
               c.subsetor,
               cl.descricao AS classificacao_descricao,
@@ -261,6 +263,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
       { header: 'Descrição',           key: 'descricao_observado', width: 40 },
       { header: 'Ações imediatas',     key: 'acoes_imediatas',  width: 40 },
       { header: 'Alto risco',          key: 'alto_risco',       width: 10 },
+      { header: 'Gestor informado',    key: 'gestor_informado', width: 14 },
       { header: 'Fotos',               key: 'fotos_count',      width: 8  },
       { header: 'Análise IA das fotos',key: 'fotos_analise',    width: 60 },
     ]
@@ -295,6 +298,7 @@ router.get('/export.xlsx', canView, async (req, res) => {
         descricao_observado: r.descricao_observado || '',
         acoes_imediatas: r.acoes_imediatas || '',
         alto_risco: r.alto_risco_potencial ? 'Sim' : 'Não',
+        gestor_informado: r.gestor_informado ? 'Sim' : 'Não',
         fotos_count: r.fotos_count || 0,
         fotos_analise: r.fotos_analise || '',
       })
@@ -325,7 +329,7 @@ router.get('/:id(\\d+)', canView, async (req, res) => {
       `SELECT c.id, c.data_comunicado, c.hora_comunicado,
               c.atividade, c.intervencao_por, c.matricula, c.funcao,
               c.outros_descricao, c.descricao_observado, c.acoes_imediatas,
-              c.alto_risco_potencial, c.criado_em,
+              c.alto_risco_potencial, c.gestor_informado, c.criado_em,
               c.classificacao_id, c.filial_id, c.area_id, c.setor_id, c.subsetor,
               cl.descricao     AS classificacao_descricao,
               f.descricao      AS filial_descricao,
@@ -410,9 +414,9 @@ router.post('/', canCreate, async (req, res) => {
           intervencao_por, matricula, funcao,
           outros_descricao,
           descricao_observado, acoes_imediatas,
-          alto_risco_potencial
+          alto_risco_potencial, gestor_informado
        )
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
        RETURNING id, criado_em`,
       [
         d.classificacao_id, d.filial_id, d.area_id, d.setor_id, d.subsetor,
@@ -421,7 +425,7 @@ router.post('/', canCreate, async (req, res) => {
         d.intervencao_por, d.matricula, d.funcao,
         d.outros_descricao,
         d.descricao_observado, d.acoes_imediatas,
-        d.alto_risco_potencial,
+        d.alto_risco_potencial, d.gestor_informado,
       ]
     )
 

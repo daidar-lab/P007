@@ -171,6 +171,7 @@ export default function ComunicadoDetail({ id }) {
             <span className="text-section">Relato</span>
             <Kv label="Descrição do que foi observado">{data.descricao_observado}</Kv>
             <Kv label="Ações imediatas">{data.acoes_imediatas}</Kv>
+            <Kv label="Gestor informado">{data.gestor_informado ? 'Sim' : 'Não'}</Kv>
           </Card>
           </div>
 

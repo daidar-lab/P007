@@ -52,6 +52,7 @@ const emptyForm = () => {
     descricao: '',
     acoes: '',
     altoRisco: '',
+    gestorInformado: '',
     fotos: [],
   }
 }
@@ -265,7 +266,8 @@ export default function Home() {
         return (
           filled(form.descricao) &&
           filled(form.acoes) &&
-          filled(form.altoRisco)
+          filled(form.altoRisco) &&
+          filled(form.gestorInformado)
         )
       case 5:
         return true
@@ -326,6 +328,7 @@ export default function Home() {
         descricao_observado:  form.descricao.trim(),
         acoes_imediatas:      form.acoes.trim(),
         alto_risco_potencial: form.altoRisco === 'sim',
+        gestor_informado:     form.gestorInformado === 'sim',
         itens_observados_ids: form.observacoes.map(Number),
         fotos,
       }
@@ -545,6 +548,20 @@ export default function Home() {
                   name="altoRisco"
                   value={form.altoRisco}
                   onChange={set('altoRisco')}
+                  options={[
+                    { value: 'sim', label: 'Sim' },
+                    { value: 'nao', label: 'Não' },
+                  ]}
+                />
+              </Field>
+            </Card>
+
+            <Card elevated padding="lg">
+              <Field label="O gestor foi informado?" required>
+                <RadioGroup
+                  name="gestorInformado"
+                  value={form.gestorInformado}
+                  onChange={set('gestorInformado')}
                   options={[
                     { value: 'sim', label: 'Sim' },
                     { value: 'nao', label: 'Não' },
