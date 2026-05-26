@@ -202,7 +202,18 @@ export default function ComunicadoDetail({ id }) {
                       <div className="detail-fotos__analise">
                         <span className="detail-fotos__analise-tag">Análise IA</span>
                         <div className="detail-fotos__analise-text markdown">
-                          <ReactMarkdown>{f.analise_ia}</ReactMarkdown>
+                          <ReactMarkdown>
+                                {
+                                  (() => {
+                                    try {
+                                      const parsed = JSON.parse(f.analise_ia)
+                                      return parsed.data || ''
+                                    } catch {
+                                      return f.analise_ia
+                                    }
+                                  })()
+                                }
+                              </ReactMarkdown>
                         </div>
                       </div>
                     )}

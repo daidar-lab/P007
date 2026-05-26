@@ -4,7 +4,7 @@ import { pool } from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
 import { validatePasswordStrength } from '../lib/password.js'
 import { roleLabel, requirePermission, PERMISSIONS } from '../lib/rbac.js'
-import { describe as describeIa, analyzePhoto as analyzePhotoIa } from '../lib/groq.js'
+import { describe as describeIa, analyzePhoto as analyzePhotoIa } from '../lib/synapse.js'
 
 const router = Router()
 
@@ -112,7 +112,7 @@ router.get('/ia-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MAN
 router.post('/ia-status', requireAuth, requirePermission(PERMISSIONS.USUARIOS_MANAGE), async (_req, res) => {
   const cfg = describeIa()
   if (!cfg.enabled) {
-    return res.status(400).json({ ok: false, error: 'IA desabilitada (GROQ_API_KEY vazio em .env)', ...cfg })
+    return res.status(400).json({ ok: false, error: 'IA desabilitada (API_KEY vazio em .env)', ...cfg })
   }
   const t0 = Date.now()
   try {

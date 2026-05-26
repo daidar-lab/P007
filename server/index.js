@@ -5,15 +5,15 @@ import bcrypt from 'bcryptjs'
 import { pool } from './db.js'
 import { requireAuth } from './middleware/auth.js'
 import { migrate } from './lib/migrate.js'
-import { describe as describeIa } from './lib/groq.js'
-import authRouter             from './routes/auth.js'
-import usuariosRouter         from './routes/usuarios.js'
-import classificacoesRouter   from './routes/classificacoes.js'
-import filiaisRouter          from './routes/filiais.js'
-import areasRouter            from './routes/areas.js'
-import setoresRouter          from './routes/setores.js'
-import itensObservadosRouter  from './routes/itens-observados.js'
-import comunicadosRouter      from './routes/comunicados.js'
+import { describe as describeIa } from './lib/synapse.js'
+import authRouter from './routes/auth.js'
+import usuariosRouter from './routes/usuarios.js'
+import classificacoesRouter from './routes/classificacoes.js'
+import filiaisRouter from './routes/filiais.js'
+import areasRouter from './routes/areas.js'
+import setoresRouter from './routes/setores.js'
+import itensObservadosRouter from './routes/itens-observados.js'
+import comunicadosRouter from './routes/comunicados.js'
 
 const app = express()
 const port = Number(process.env.PORT) || 3001
@@ -29,13 +29,13 @@ app.use('/api/auth', authRouter)
 // --- Tudo abaixo exige autenticação ---
 app.use('/api', requireAuth)
 
-app.use('/api/usuarios',          usuariosRouter)
-app.use('/api/classificacoes',    classificacoesRouter)
-app.use('/api/filiais',           filiaisRouter)
-app.use('/api/areas',             areasRouter)
-app.use('/api/setores',           setoresRouter)
-app.use('/api/itens-observados',  itensObservadosRouter)
-app.use('/api/comunicados',       comunicadosRouter)
+app.use('/api/usuarios', usuariosRouter)
+app.use('/api/classificacoes', classificacoesRouter)
+app.use('/api/filiais', filiaisRouter)
+app.use('/api/areas', areasRouter)
+app.use('/api/setores', setoresRouter)
+app.use('/api/itens-observados', itensObservadosRouter)
+app.use('/api/comunicados', comunicadosRouter)
 
 async function ensureAdminUser() {
   try {
@@ -65,8 +65,8 @@ app.listen(port, async () => {
   await ensureAdminUser()
   const b = describeIa()
   if (b.enabled) {
-    console.log(`[ia] habilitada — provider="${b.provider}" model="${b.model}"`)
+    console.log(`[ia] habilitada — provider="${b.provider}"`)
   } else {
-    console.log('[ia] desabilitada — defina GROQ_API_KEY em .env para ativar')
+    console.log('[ia] desabilitada — defina API_KEY em .env para ativar')
   }
 })
