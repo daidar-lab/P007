@@ -214,3 +214,15 @@ export const updateUsuario = (id, data) =>
 
 export const resetUsuarioPassword = (id, senha) =>
   request(`/api/usuarios/${id}/reset-password`, { method: 'POST', ...jsonBody({ senha }) })
+
+// ---------- E-mails Workflow ----------
+export const getEmailsWorkflow = () => request('/api/emails-workflow')
+
+export const createEmailWorkflow = (data) =>
+  request('/api/emails-workflow', { method: 'POST', ...jsonBody(data) })
+
+export const updateEmailWorkflow = (id, data) =>
+  request(`/api/emails-workflow/${id}`, { method: 'PUT', ...jsonBody(data) })
+
+export const deleteEmailWorkflow = (id) =>
+  request(`/api/emails-workflow/${id}`, { method: 'DELETE' })

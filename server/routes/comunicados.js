@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs'
 import { pool } from '../db.js'
 import { requirePermission, PERMISSIONS } from '../lib/rbac.js'
 import { analyzePhotos } from '../lib/synapse.js'
+import { sendComunicadoEmail } from '../lib/mailer.js'
 
 const router = Router()
 
@@ -460,6 +461,34 @@ router.post('/', canCreate, async (req, res) => {
       criado_em: created.criado_em,
       fotos_salvas: d.fotos.length,
     })
+
+    // Workflow de email assíncrono
+    try {
+      const { rows: emails } = await pool.query(
+        `SELECT DISTINCT e.id, e.email, e.nome 
+           FROM dim_email_workflow e
+           JOIN dim_email_workflow_regra r ON r.email_workflow_id = e.id
+          WHERE e.ativo = TRUE
+            AND r.area_id = $1 
+            AND (r.setor_id IS NULL OR r.setor_id = $2)`,
+        [d.area_id, d.setor_id]
+      )
+      if (emails.length > 0) {
+        const cData = {
+          id: created.id,
+          data_comunicado: d.data_comunicado,
+          hora_comunicado: d.hora_comunicado,
+          atividade: d.atividade,
+          intervencao_por: d.intervencao_por,
+          alto_risco_potencial: d.alto_risco_potencial
+        }
+        for (const e of emails) {
+          sendComunicadoEmail(cData, e.email, e.nome).catch(err => console.error('[mailer] catch:', err))
+        }
+      }
+    } catch (errWorkflow) {
+      console.error('[comunicados] erro na busca de emails para workflow:', errWorkflow)
+    }
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {})
     if (err.code === '23503') {

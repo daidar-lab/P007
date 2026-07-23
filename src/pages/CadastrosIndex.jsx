@@ -44,6 +44,12 @@ const ENTIDADES = [
     perm: PERMISSIONS.USUARIOS_MANAGE,
     highlight: true,
   },
+  {
+    key: 'emails-workflow',
+    title: 'Workflow de E-mails',
+    subtitle: 'Destinatários para alertas de comunicados',
+    perm: PERMISSIONS.CADASTROS_MANAGE,
+  },
 ]
 
 export default function CadastrosIndex() {

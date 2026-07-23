@@ -1,0 +1,2 @@
+ALTER TABLE dim_email_workflow 
+ADD COLUMN IF NOT EXISTS setor_id INT REFERENCES dim_setor(id) ON DELETE CASCADE;

@@ -26,6 +26,7 @@ const ORDERED_FILES = [
   // 2) Dimensões com FK (filial → área → setor)
   'dim_area.sql',
   'dim_setor.sql',
+  'dim_email_workflow.sql',
 
   // 3) Fatos
   'fato_comunicado.sql',
@@ -37,6 +38,8 @@ const ORDERED_FILES = [
   'fato_comunicado_add_subsetor.sql',
   'fato_comunicado_foto_add_analise.sql',
   'fato_comunicado_add_gestor_informado.sql',
+  'dim_email_workflow_add_setor.sql',
+  'dim_email_workflow_regras.sql',
 ]
 
 const ALREADY_EXISTS_CODES = new Set([

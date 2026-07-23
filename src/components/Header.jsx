@@ -1,10 +1,10 @@
 import './Header.css'
 
-export default function Header({ leading, title, subtitle, trailing }) {
+export default function Header({ leading, title, subtitle, trailing, align = 'left' }) {
   return (
     <header className="header">
       <div className="header__side">{leading}</div>
-      <div className="header__center">
+      <div className="header__center" style={{ textAlign: align }}>
         {title && <h1 className="header__title">{title}</h1>}
         {subtitle && <p className="header__subtitle">{subtitle}</p>}
       </div>

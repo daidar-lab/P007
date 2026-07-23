@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import './env.js'
 import express from 'express'
 import cors from 'cors'
 import bcrypt from 'bcryptjs'
@@ -14,6 +14,7 @@ import areasRouter from './routes/areas.js'
 import setoresRouter from './routes/setores.js'
 import itensObservadosRouter from './routes/itens-observados.js'
 import comunicadosRouter from './routes/comunicados.js'
+import emailsWorkflowRouter from './routes/emails-workflow.js'
 
 const app = express()
 const port = Number(process.env.PORT) || 3001
@@ -36,6 +37,7 @@ app.use('/api/areas', areasRouter)
 app.use('/api/setores', setoresRouter)
 app.use('/api/itens-observados', itensObservadosRouter)
 app.use('/api/comunicados', comunicadosRouter)
+app.use('/api/emails-workflow', emailsWorkflowRouter)
 
 async function ensureAdminUser() {
   try {

@@ -10,6 +10,7 @@ import RadioGroup from '../components/RadioGroup.jsx'
 import CheckboxGroup from '../components/CheckboxGroup.jsx'
 import Combobox from '../components/Combobox.jsx'
 import PhotoUploader from '../components/PhotoUploader.jsx'
+import BrandLogo from '../components/BrandLogo.jsx'
 import { ChevronLeft, ChevronRight } from '../components/Icon.jsx'
 import {
   getClassificacoes,
@@ -355,17 +356,15 @@ export default function Home() {
 
   return (
     <form className="screen" onSubmit={(e) => e.preventDefault()} noValidate>
-      <div className="brand">
-        <div className="brand__logo">CI</div>
-        <div>
-          <p className="brand__name">Cidade Imperial</p>
-          <p className="brand__tag">Segurança do Trabalho · Interno</p>
-        </div>
+      <div className="brand" style={{ flexDirection: 'column', textAlign: 'center', gap: 8 }}>
+        <BrandLogo size="md" />
+        <p className="brand__tag" style={{ margin: 0 }}>Segurança do Trabalho · Interno</p>
       </div>
 
       <Header
         title="Comunicado de Intervenção"
         subtitle="Condições e comportamentos inseguros"
+        align="center"
       />
 
       <Stepper steps={STEPS} current={step} />

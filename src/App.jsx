@@ -12,6 +12,7 @@ import AreasCrud from './pages/AreasCrud.jsx'
 import SetoresCrud from './pages/SetoresCrud.jsx'
 import ItensObservadosCrud from './pages/ItensObservadosCrud.jsx'
 import UsuariosCrud from './pages/UsuariosCrud.jsx'
+import EmailsWorkflowCrud from './pages/EmailsWorkflowCrud.jsx'
 import { useHashRoute } from './lib/router.js'
 import { getToken, clearSession } from './lib/auth.js'
 import { getMe } from './lib/api.js'
@@ -51,6 +52,7 @@ function renderRoute(route, user) {
   if (route === 'cadastros/areas')              return guard(PERMISSIONS.CADASTROS_MANAGE, <AreasCrud />)
   if (route === 'cadastros/setores')            return guard(PERMISSIONS.CADASTROS_MANAGE, <SetoresCrud />)
   if (route === 'cadastros/itens-observados')   return guard(PERMISSIONS.CADASTROS_MANAGE, <ItensObservadosCrud />)
+  if (route === 'cadastros/emails-workflow')    return guard(PERMISSIONS.CADASTROS_MANAGE, <EmailsWorkflowCrud />)
   if (route === 'cadastros/usuarios')           return guard(PERMISSIONS.USUARIOS_MANAGE, <UsuariosCrud />)
 
   return <NotFound />

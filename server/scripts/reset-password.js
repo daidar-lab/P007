@@ -3,7 +3,7 @@
 // Uso:   node server/scripts/reset-password.js <usuario> <nova_senha>
 // Exige DATABASE_URL no .env e que a tabela dim_usuario exista.
 
-import 'dotenv/config'
+import '../env.js'
 import bcrypt from 'bcryptjs'
 import { pool } from '../db.js'
 import { validatePasswordStrength } from '../lib/password.js'

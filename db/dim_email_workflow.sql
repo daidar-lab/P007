@@ -1,0 +1,8 @@
+CREATE TABLE dim_email_workflow (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(120) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    area_id INT NOT NULL REFERENCES dim_area(id) ON DELETE CASCADE,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
