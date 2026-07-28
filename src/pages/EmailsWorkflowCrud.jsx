@@ -231,27 +231,43 @@ export default function EmailsWorkflowCrud() {
           </div>
         </Card>
         
-        <h3 style={{ marginTop: 24, marginBottom: 12, padding: '0 12px' }}>Regras de Envio</h3>
-        
-        {draft.regras.length === 0 && (
-          <p className="text-muted" style={{ padding: '0 12px' }}>Nenhuma regra configurada. Adicione ao menos uma área.</p>
-        )}
+        <Card padding="md" className="stack stack-md" style={{ marginTop: 24 }}>
+          <div className="row row-between" style={{ alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: 'var(--fs-16)', fontWeight: 'var(--fw-bold)' }}>Regras de Envio</h3>
+            <Button variant="secondary" size="sm" icon={<Plus width={16} height={16} />} onClick={addRegra}>
+              Adicionar
+            </Button>
+          </div>
+          
+          {draft.regras.length === 0 && (
+            <p className="text-muted" style={{ margin: 0 }}>Nenhuma regra configurada. Adicione ao menos uma área.</p>
+          )}
 
-        <div className="stack stack-sm">
-          {draft.regras.map((regra, index) => {
-            const setoresFiltrados = regra.area_id 
-              ? setores.filter(s => String(s.area_id) === String(regra.area_id))
-              : []
-            const setoresOptions = [{ value: '', label: 'Todos os setores (Nível Área)' }, ...setoresFiltrados.map(s => ({
-              value: String(s.id),
-              label: s.descricao
-            }))]
+          {draft.regras.length > 0 && (
+            <div className="stack stack-md" style={{ marginTop: 12 }}>
+              {draft.regras.map((regra, index) => {
+                const setoresFiltrados = regra.area_id 
+                  ? setores.filter(s => String(s.area_id) === String(regra.area_id))
+                  : []
+                const setoresOptions = [{ value: '', label: 'Todos os setores (Nível Área)' }, ...setoresFiltrados.map(s => ({
+                  value: String(s.id),
+                  label: s.descricao
+                }))]
 
-            return (
-              <Card key={regra.id} padding="md" className="stack stack-sm">
-                <div className="row row-between" style={{ alignItems: 'flex-start' }}>
-                  <div className="stack stack-sm" style={{ flex: 1, paddingRight: 12 }}>
-                    <Field label={`Área ${index + 1}`} required>
+                const isLast = index === draft.regras.length - 1
+
+                return (
+                  <div key={regra.id} className="stack stack-sm" style={{ paddingBottom: isLast ? 0 : 16, borderBottom: isLast ? 'none' : '1px solid var(--color-border)' }}>
+                    <div className="row row-between" style={{ alignItems: 'center', marginBottom: 8 }}>
+                      <span style={{ fontSize: 'var(--fs-14)', fontWeight: 'var(--fw-medium)', color: 'var(--color-text-secondary)' }}>
+                        Regra {index + 1}
+                      </span>
+                      <Button variant="ghost" size="sm" onClick={() => removeRegra(index)} className="text-danger">
+                        Remover
+                      </Button>
+                    </div>
+                    
+                    <Field label="Área (Processo)" required>
                       <Combobox
                         value={regra.area_id}
                         onChange={(v) => updateRegra(index, 'area_id', v)}
@@ -272,20 +288,11 @@ export default function EmailsWorkflowCrud() {
                       />
                     </Field>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => removeRegra(index)} className="text-danger" style={{ marginTop: 24 }}>
-                    Remover
-                  </Button>
-                </div>
-              </Card>
-            )
-          })}
-        </div>
-
-        <div style={{ padding: '12px', display: 'flex', justifyContent: 'center' }}>
-          <Button variant="secondary" size="sm" icon={<Plus width={16} height={16} />} onClick={addRegra}>
-            Adicionar regra
-          </Button>
-        </div>
+                )
+              })}
+            </div>
+          )}
+        </Card>
 
         {error && <p className="crud-error">{error}</p>}
 
